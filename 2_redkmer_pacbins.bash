@@ -52,3 +52,4 @@ printf "======= making txt file  =======\n"
 awk 'BEGIN {print "pacbio_read\tfemale\tmale\tCQ"} {print}' $CWD/counts/merge_cq.2 > $CWD/counts/merge.txt
 
 
+
