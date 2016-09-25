@@ -1,6 +1,9 @@
 ## Export the joint_kmer_ratio_name.txt produced in the pipeline
 
-pacbio<-read.table("/home/nikolai/Software/redkmer/testproject/counts/merge.txt", header=T, sep="\t")
+this.dir <- dirname(parent.frame(2)$ofile)
+setwd(this.dir)
+
+pacbio<-read.table("./testproject/counts/pacBio_MappedReads.txt", header=T, sep="\t")
 head(pacbio)
 
 pacbio$candidate[pacbio$CQ>1.5]<-"X"
