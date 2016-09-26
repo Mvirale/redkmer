@@ -1,6 +1,6 @@
 # redkmer
 
-
+Version 0.2
 
 
 **Example usage**
