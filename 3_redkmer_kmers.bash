@@ -16,6 +16,12 @@ fi
 
 source redkmer.cfg
 
+illLIBMsize=8000
+illLIBFsize=8000
+illnorm=(($illLIBMsize+$illLIBFsize)/2)
+illnormM=$illLIBMsize*$illnorm
+illnormF=$illLIBFsize*$illnorm
+
 mkdir -p $CWD/kmers
 
 ## Use this to skip sections if needed
@@ -33,32 +39,43 @@ $JFISH count -C -L 2 -m 30 $illF -o $CWD/kmers/f -c 3 -s 1000000000 -t 2
 $JFISH dump $CWD/kmers/m -c -L 2 -o $CWD/kmers/m.counts
 $JFISH dump $CWD/kmers/f -c -L 2 -o $CWD/kmers/f.counts
 
-
 # sort kmers libraries
-
 sort $CWD/kmers/m.counts > $CWD/kmers/m.sorted
 sort $CWD/kmers/f.counts > $CWD/kmers/f.sorted
 
 # Join libraries reporting all results and adding a 0 
-
 join -a1 -a2 -1 1 -2 1 -o '0,1.2,2.2' -e "0" $CWD/kmers/f.sorted $CWD/kmers/m.sorted > $CWD/kmers/kmer_counts
 
 # Remove kmers with no male match
 awk '{if ($3>0) print}' $CWD/kmers/kmer_counts > $CWD/kmers/kmer_shared_counts_a
-
 
 # Add a line with kmer_increasing_num to name the kmers
 awk '{printf("%.1f %s\n", 1+(NR-1), $0)}' $CWD/kmers/kmer_shared_counts_a > $CWD/kmers/kmer_shared_counts_b
 awk '{print "kmer_"$0}' $CWD/kmers/kmer_shared_counts_b > $CWD/kmers/kmers
 
 
+# Normalize
+awk '{print $1, $2, ($3*$illnormF), ($4*$illnormM)}' $CWD/kmers/kmers > $CWD/kmers/kmers_norm
+
+# Add ratio female/male
+awk '{_div1= $4 ? ($3 / $4) : 0 ; print $0, _div1 }' $CWD/kmers/kmers_norm > $CWD/kmers/kmers_cq
+
+# Adding sum
+awk '{print $0, ($3+$4)}' $CWD/kmers/kmers_cq > $CWD/kmers/kmers_sum
+
+# Replace space with tabs
+awk -v OFS="\t" '$1=$1' $CWD/kmers/kmers_sum > $CWD/kmers/kmers_sum
+
+# get library sizes
+# do this by pull info from output of qc report (fist unzip)
+
 printf "======= cleaning up =======\n"
 
-#rm $CWD/kmers/m
-#rm $CWD/kmers/f
-#rm $CWD/kmers/m.counts
-#rm $CWD/kmers/f.counts
-#rm $CWD/kmers/kmer_counts
-#rm $CWD/kmers/kmer_shared_counts_a
-#rm $CWD/kmers/kmer_shared_counts_b
+# rm $CWD/kmers/m
+# rm $CWD/kmers/f
+# rm $CWD/kmers/m.counts
+# rm $CWD/kmers/f.counts
+# rm $CWD/kmers/kmer_counts
+# rm $CWD/kmers/kmer_shared_counts_a
+# rm $CWD/kmers/kmer_shared_counts_b
 
