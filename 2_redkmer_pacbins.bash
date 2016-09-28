@@ -27,10 +27,14 @@ mkdir -p $CWD/bins
 ## everything below "fi" is run
 
 
+#calculate library sizes
+
+illLIBMsize=$(wc -l $illM | awk '{print ($1/4)}')
+illLIBFsize=$(wc -l $illF | awk '{print ($1/4)}')
+illnorm=$((($illLIBMsize+$illLIBFsize)/2))
+
 # Build the index and map the Illumina data
-$BOWTIEB $pacM $CWD/index/m_pac
-
-
+#$BOWTIEB $pacM $CWD/index/m_pac
 
 # Map the Illumina data on the pacbio reads
 $BOWTIE -a -p20 -v 0 $CWD/index/m_pac --suppress 1,2,4,5,6,7,8,9 $illF $CWD/counts/female.txt
@@ -44,7 +48,12 @@ sort $CWD/counts/male.txt | uniq -c >$CWD/counts/male
 printf "======= merging female and male libraries =======\n"
 
 join -a1 -a2 -1 2 -2 2 -o '0,1.1,2.1' -e "0" $CWD/counts/female $CWD/counts/male > $CWD/counts/merge
-awk '$4=(($2+0.1)/($3+0.1))' $CWD/counts/merge > $CWD/counts/merge_cq
+
+awk -v ma="$illLIBMsize" -v fema="$illLIBFsize" -v le="$illnorm" '{print $1, ($2*fema/le), ($3*ma/le)}' $CWD/counts/merge > $CWD/counts/merge_norm
+
+
+#Add pacbioCQ female/male
+awk '{_div1= $3 ? ($2 / $3) : 0 ; print $0, _div1 }' $CWD/counts/merge_norm > $CWD/counts/merge_cq
 
 # Replace space with tabs
 awk -v OFS="\t" '$1=$1' $CWD/counts/merge_cq > $CWD/counts/merge_cq.2
@@ -62,7 +71,6 @@ awk '{if($4<1.5 && $4>0.2) print $1}' $CWD/counts/merge_cq.2 > $CWD/bins/A_reads
 awk '{if($4<0.2) print $1}' $CWD/counts/merge_cq.2 > $CWD/bins/Y_reads
 
 # Get sequences of pacBio bins
-
 cat $CWD/bins/X_reads | xargs $SAMTOOLS faidx $pacM > $CWD/bins/X_fasta
 cat $CWD/bins/A_reads | xargs $SAMTOOLS faidx $pacM > $CWD/bins/A_fasta
 cat $CWD/bins/Y_reads | xargs $SAMTOOLS faidx $pacM > $CWD/bins/Y_fasta
@@ -70,6 +78,7 @@ cat $CWD/bins/Y_reads | xargs $SAMTOOLS faidx $pacM > $CWD/bins/Y_fasta
 printf "======= cleaning up  =======\n"
 
 rm $CWD/counts/merge
+rm $CWD/counts/merge_norm
 rm $CWD/counts/merge_cq
 rm $CWD/counts/merge_cq.2
 rm $CWD/counts/female.txt

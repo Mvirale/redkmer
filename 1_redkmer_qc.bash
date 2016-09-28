@@ -23,6 +23,7 @@ echo "========== quality checking illumina reads and producing report ==========
 $FASTQC $illF -o $CWD/qualityreports/
 $FASTQC $illM -o $CWD/qualityreports/
 
+
 # echo "========== filtering for read quality =========="
 # 
 # ##implement QC for reads
