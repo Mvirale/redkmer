@@ -1,6 +1,15 @@
 	# path to the working directory
 BASEDIR=/home/nikolai/Software/redkmer
+
+#80kb chroms, 8k illumina/chrom, no errors, no X-repeats
 CWD=testproject
+
+#80kb chroms, 8k illumina/chrom, no errors, with X-repeats
+CWD=testproject_XR
+
+#80kb chroms, 8k illumina/chrom, with 0.001 error, with X-repeats
+CWD=testproject_XR_err
+
 
 	# path to the male pacbio read data
 pacDIR=testreadspac
@@ -14,4 +23,4 @@ illM=${CWD}/${illDIR}/m.fastq
 illF=${CWD}/${illDIR}/f.fastq
 
 	# path to the mitochondrial Reference
-mtREF=testproject/MtRef.fasta
+mtREF=${CWD}/MtRef.fasta

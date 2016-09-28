@@ -1,9 +1,14 @@
 #!/bin/bash
-pacTARGETDIR=../testproject/testreadspac/
-illTARGETDIR=../testproject/testreadsill/
+mkdir -p ../testprojectNEW/
+mkdir -p ../testprojectNEW/
+mkdir -p ../testprojectNEW/testreadspac/
+mkdir -p ../testprojectNEW/testreadsill/
+
+pacTARGETDIR=../testprojectNEW/testreadspac/
+illTARGETDIR=../testprojectNEW/testreadsill/
 
 #size in MB
-GSIZE=0.5
+GSIZE=0.08
 MSIZE=0.01
 
 #Generate random reference chromosomes
@@ -12,15 +17,18 @@ MSIZE=0.01
 ./readgenerators/rangen $GSIZE > Y.fasta
 #./readgenerators/rangen $MSIZE > M.fasta
 
-XR=$(((RANDOM % 10) + 1))
-XS=$(((RANDOM % 3) + 1))
+#XR=$(((RANDOM % 10) + 1))
+#XS=$(((RANDOM % 3) + 1))
+XR=10
+XS=2
 
 #introduce X repeats
 tail X.fasta -n $XS > rep.fasta
 for (( c=0; c<=XR; c++ ))
-do 
+do
 cat rep.fasta rep.fasta > rep2.fasta
 mv rep2.fasta rep.fasta
+#python2 ${BASEDIR}/simulatedata/mutate.py ${BASEDIR}/simulatedata/rep2.fasta 0.001 > ${BASEDIR}/simulatedata/rep.fasta
 done
 cat X.fasta rep.fasta > rep2.fasta
 mv rep2.fasta X.fasta
@@ -29,13 +37,13 @@ mv rep.fasta Xrep.fasta
 #------------------------------- Illumina ------------------------------------------
 
 # error rates
-ILLsnp=0.002
-ILLins=0.002
-ILLdel=0.002
+ILLsnp=0.001
+ILLins=0.001
+ILLdel=0.001
 # length
 ILLsize=100
 # number
-ILLnum=2k
+ILLnum=8k
 
 #generate reads
 ./readgenerators/randomreads.sh ref=A.fasta out=A1.illm snprate=$ILLsnp insrate=$ILLins delrate=$ILLdel reads=$ILLnum length=$ILLsize gaussian seed=-1
@@ -63,7 +71,7 @@ cp f.fastq ${illTARGETDIR}
 #-------------------------------- Pacbio --------------------------------------------
 
 # error rates
-PACerror=0.0005
+PACerror=0.001
 # coverage
 PACcov=5
 # length
@@ -82,7 +90,6 @@ PACsize=3000
 
 cat *.pacreads* > m_pac.fasta
 rm *.pacreads
-rm /ref/genome/1/*
 rm *.dam
 cp m_pac.fasta ${pacTARGETDIR}
 
