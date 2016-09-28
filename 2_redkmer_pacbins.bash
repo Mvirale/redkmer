@@ -71,7 +71,7 @@ awk '{if($4<1.5 && $4>0.2) print $1}' $CWD/counts/merge_cq.2 > $CWD/bins/A_reads
 awk '{if($4<0.2) print $1}' $CWD/counts/merge_cq.2 > $CWD/bins/Y_reads
 
 # Get sequences of pacBio bins
-rm $CWD/testreadspac/m_pac.fasta.fai
+rm -f $CWD/testreadspac/m_pac.fasta.fai
 cat $CWD/bins/X_reads | xargs $SAMTOOLS faidx $pacM > $CWD/bins/X_fasta
 cat $CWD/bins/A_reads | xargs $SAMTOOLS faidx $pacM > $CWD/bins/A_fasta
 cat $CWD/bins/Y_reads | xargs $SAMTOOLS faidx $pacM > $CWD/bins/Y_fasta
