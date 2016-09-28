@@ -16,8 +16,6 @@ fi
 
 source redkmer.cfg
 
-#make kmer libraries
-
 
 #calculate library sizes
 
