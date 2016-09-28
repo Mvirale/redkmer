@@ -1,14 +1,17 @@
 	# path to the working directory
 BASEDIR=/home/nikolai/Software/redkmer
 
-#80kb chroms, 8k illumina/chrom, no errors, no X-repeats
+#80kb chroms @5x coverage, 10k illumina/chrom, no errors, no X-repeats
 CWD=testproject
 
-#80kb chroms, 8k illumina/chrom, no errors, with X-repeats
-CWD=testproject_XR
+#80kb chroms @5x coverage, 10k illumina/chrom, no errors, with X-repeats
+#CWD=testproject_XR
 
-#80kb chroms, 8k illumina/chrom, with 0.001 error, with X-repeats
-CWD=testproject_XR_err
+#80kb chroms @5x coverage, 10k illumina/chrom, with errors, with X-repeats
+#CWD=testproject_XR_err
+
+#80kb chroms @5x coverage, 10k illumina/chrom, with errors, with degenerate X-repeats
+#CWD=testproject_XRdegen_err
 
 
 	# path to the male pacbio read data
