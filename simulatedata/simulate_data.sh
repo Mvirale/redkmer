@@ -1,9 +1,14 @@
 #!/bin/bash
+
+PY2=/usr/bin/python2
+SIMUDIR=/home/nikolai/Software/redkmer/simulatedata
+
 mkdir -p ../testprojectNEW/
 mkdir -p ../testprojectNEW/
 mkdir -p ../testprojectNEW/testreadspac/
 mkdir -p ../testprojectNEW/testreadsill/
 
+chromTARGETDIR=../testprojectNEW/
 pacTARGETDIR=../testprojectNEW/testreadspac/
 illTARGETDIR=../testprojectNEW/testreadsill/
 
@@ -17,33 +22,54 @@ MSIZE=0.01
 ./readgenerators/rangen $GSIZE > Y.fasta
 #./readgenerators/rangen $MSIZE > M.fasta
 
+
 #XR=$(((RANDOM % 10) + 1))
 #XS=$(((RANDOM % 3) + 1))
-XR=10
+XR=8
 XS=2
+REPEATDEGEN=0.001
 
 #introduce X repeats
 tail X.fasta -n $XS > rep.fasta
-for (( c=0; c<=XR; c++ ))
+for ((c=0; c<=XR; c++))
 do
 cat rep.fasta rep.fasta > rep2.fasta
-mv rep2.fasta rep.fasta
-#python2 ${BASEDIR}/simulatedata/mutate.py ${BASEDIR}/simulatedata/rep2.fasta 0.001 > ${BASEDIR}/simulatedata/rep.fasta
+
+head X.fasta -n 1 > head.text
+cat head.text rep2.fasta > rep3.fasta
+$PY2 mutate.py rep3.fasta $REPEATDEGEN > rep.fasta
+
+#mv rep2.fasta rep.fasta
+
+sed '1d' rep.fasta > tmpfile; mv tmpfile rep.fasta
 done
+fold -w 80 rep.fasta > tmpfile; mv tmpfile rep.fasta
 cat X.fasta rep.fasta > rep2.fasta
+
 mv rep2.fasta X.fasta
 mv rep.fasta Xrep.fasta
+rm head.text
+rm rep3.fasta
+
+cp A.fasta $chromTARGETDIR
+cp X.fasta $chromTARGETDIR
+cp Y.fasta $chromTARGETDIR
+cp Xrep.fasta $chromTARGETDIR
+#cp M.fasta $chromTARGETDIR
+
+
 
 #------------------------------- Illumina ------------------------------------------
 
 # error rates
-ILLsnp=0.001
-ILLins=0.001
-ILLdel=0.001
+ILLsnp=0
+ILLins=0
+ILLdel=0
+#0,001
 # length
 ILLsize=100
 # number
-ILLnum=8k
+ILLnum=10k
 
 #generate reads
 ./readgenerators/randomreads.sh ref=A.fasta out=A1.illm snprate=$ILLsnp insrate=$ILLins delrate=$ILLdel reads=$ILLnum length=$ILLsize gaussian seed=-1
@@ -71,7 +97,8 @@ cp f.fastq ${illTARGETDIR}
 #-------------------------------- Pacbio --------------------------------------------
 
 # error rates
-PACerror=0.001
+PACerror=0
+#0.001
 # coverage
 PACcov=5
 # length
