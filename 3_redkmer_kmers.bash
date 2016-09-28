@@ -35,8 +35,8 @@ printf "======= using jellyfish to create kmers of lenght 30 from each Illumina 
 
 #make kmer libraries
 
-#$JFISH count -C -L 2 -m 30 $illM -o $CWD/kmers/m -c 3 -s 1000000000 -t 2
-#$JFISH count -C -L 2 -m 30 $illF -o $CWD/kmers/f -c 3 -s 1000000000 -t 2
+$JFISH count -C -L 2 -m 30 $illM -o $CWD/kmers/m -c 3 -s 1000000000 -t 2
+$JFISH count -C -L 2 -m 30 $illF -o $CWD/kmers/f -c 3 -s 1000000000 -t 2
 $JFISH dump $CWD/kmers/m -c -L 2 -o $CWD/kmers/m.counts
 $JFISH dump $CWD/kmers/f -c -L 2 -o $CWD/kmers/f.counts
 
@@ -61,19 +61,19 @@ awk -v ma="$illLIBMsize" -v fema="$illLIBFsize" -v le="$illnorm" '{print $1, $2,
 awk '{_div1= $4 ? ($3 / $4) : 0 ; print $0, _div1 }' $CWD/kmers/kmers_norm > $CWD/kmers/kmers_cq
 
 #Adding sum
-awk '{print $0, ($3+$4)}' $CWD/kmers/kmers_cq > $CWD/kmers/kmers_sum
+awk '{print $0, ($3+$4)}' $CWD/kmers/kmers_cq |sort > $CWD/kmers/kmers_sum
 
 #Replace space with tabs
-awk -v OFS="\t" '$1=$1' $CWD/kmers/kmers_sum > $CWD/kmers/kmers_final
+awk -v OFS="\t" '$1=$1' $CWD/kmers/kmers_sum > $CWD/kmers/kmers_to_merge
 
 #Add column header
-awk 'BEGIN {print "kmer_id\tseq\tfemale\tmale\tCQ\tsum"} {print}' $CWD/kmers/kmers_final > $CWD/kmers/kmer_counts
+awk 'BEGIN {print "kmer_id\tseq\tfemale\tmale\tCQ\tsum"} {print}' $CWD/kmers/kmers_to_merge > $CWD/kmers/kmer_counts
 
 # make fasta file from kmers for blast
-awk '{print ">"$1"\n"$2}' $CWD/kmers/kmers_final > $CWD/kmers/kmer.fasta
+awk '{print ">"$1"\n"$2}' $CWD/kmers/kmers_to_merge > $CWD/kmers/kmer.fasta
 
 
-# printf "======= cleaning up =======\n"
+printf "======= cleaning up =======\n"
 
 rm $CWD/kmers/m.counts
 rm $CWD/kmers/f.counts
@@ -85,4 +85,3 @@ rm $CWD/kmers/kmers
 rm $CWD/kmers/kmers_norm
 rm $CWD/kmers/kmers_cq
 rm $CWD/kmers/kmers_sum
-rm $CWD/kmers/kmers_final
