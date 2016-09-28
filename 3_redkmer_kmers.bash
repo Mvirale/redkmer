@@ -37,8 +37,8 @@ printf "======= using jellyfish to create kmers of lenght 30 from each Illumina 
 
 #make kmer libraries
 
-$JFISH count -C -L 2 -m 30 $illM -o $CWD/kmers/m -c 3 -s 1000000000 -t 2
-$JFISH count -C -L 2 -m 30 $illF -o $CWD/kmers/f -c 3 -s 1000000000 -t 2
+#$JFISH count -C -L 2 -m 30 $illM -o $CWD/kmers/m -c 3 -s 1000000000 -t 2
+#$JFISH count -C -L 2 -m 30 $illF -o $CWD/kmers/f -c 3 -s 1000000000 -t 2
 $JFISH dump $CWD/kmers/m -c -L 2 -o $CWD/kmers/m.counts
 $JFISH dump $CWD/kmers/f -c -L 2 -o $CWD/kmers/f.counts
 
@@ -69,15 +69,18 @@ awk '{print $0, ($3+$4)}' $CWD/kmers/kmers_cq > $CWD/kmers/kmers_sum
 awk -v OFS="\t" '$1=$1' $CWD/kmers/kmers_sum > $CWD/kmers/kmers_final
 
 #Add column header
-awk 'BEGIN {print "kmer_id\tseq\tfemale\tmale\tCQ\tsum"} {print}' $CWD/kmers/kmers_final > $CWD/kmers/kmers_merge
+awk 'BEGIN {print "kmer_id\tseq\tfemale\tmale\tCQ\tsum"} {print}' $CWD/kmers/kmers_final > $CWD/kmers/kmer_counts
 
+# make fasta file from kmers for blast
+awk '{print ">"$1"\n"$2}' $CWD/kmers/kmers_final > $CWD/kmers/kmer.fasta
 
 
 # printf "======= cleaning up =======\n"
 
 rm $CWD/kmers/m.counts
 rm $CWD/kmers/f.counts
-rm $CWD/kmers/kmer_counts
+rm $CWD/kmers/f.sorted
+rm $CWD/kmers/m.sorted
 rm $CWD/kmers/kmer_shared_counts_a
 rm $CWD/kmers/kmer_shared_counts_b
 rm $CWD/kmers/kmers
