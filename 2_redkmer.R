@@ -1,7 +1,7 @@
 library (ggplot2)
 this.dir <- dirname(parent.frame(2)$ofile)
 setwd(this.dir)
-pacbio<-read.table("./testproject2/counts/pacBio_MappedReads.txt", header=T, sep="\t")
+pacbio<-read.table("./testproject/counts/pacBio_MappedReads.txt", header=T, sep="\t")
 
 pacbio$candidate[pacbio$CQ>1.5]<-"X"
 pacbio$candidate[pacbio$CQ<1.5]<-"A"
@@ -15,4 +15,9 @@ summary(pacbio$CQ)
 
 g1 <- ggplot(pacbio) + geom_point(aes(x=log10(sum), y=CQ,color=candidate),alpha=0.4)
 plot(g1)
+ggsave("./testproject/counts/pacBIO_points.png")
+
+g2<- ggplot(pacbio)+geom_histogram(aes(x=CQ),binwidth = 0.05)
+plot(g2)
+ggsave("./testproject/counts/pacBIO_histogram.png")
 
