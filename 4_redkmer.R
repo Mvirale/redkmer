@@ -8,16 +8,28 @@ kmer_blast$candidate[kmer_blast$CQ<1.5]<-"A"
 kmer_blast$candidate[kmer_blast$CQ<0.2]<-"Y"
 kmer_blast$candidate<-as.factor(kmer_blast$candidate)
 
-kmer_X<-subset(kmer_blast,kmer_blast$bin=="X")
-dim(kmer_X)
-dim(kmer_blast)
-summary(kmer_blast$candidate)
-summary(kmer_blast$CQ)
-summary(kmer_blast$bin)
+print("Perform selection")
+
+kmer_blast$selection<-"not selected"
+kmer_blast$selection[kmer_blast$bin=="X"]<-"X-kmers"
+kmer_blast$selection[kmer_blast$sum>selectSum & kmer_blast$CQ]<-"candidate kmers"
+kmer_blast$selection<-as.factor(kmer_blast$selection)
+summary(kmer_blast$selection)
+candidateXkmers<-subset(kmer_blast,kmer_blast$selection=="candidate kmers")
+
+print("exporting data")
+
+write.table(candidateXkmers,file= "./testproject_XRdegen_err/kmers/candidateXkmers.table",sep="\t",row.names = F,quote=F)
+candidates<-candidateXkmers[,c(1,2)]
+write.table(candidates,file= "./testproject_XRdegen_err/kmers/candidateXkmers.seq",sep="\t",row.names = F,quote=F,col.names=F)
+
+print("making plot")
 
 g1 <- ggplot()+ 
-  geom_point(data=kmer_blast, aes(x=log10(sum), y=CQ),alpha=0.4, color="grey")+
-  geom_point(data=kmer_X, aes(x=log10(sum), y=CQ),alpha=0.4, color="red")+
-  ylim(0,3)
+  geom_point(data=kmer_blast, aes(x=log10(sum), y=CQ, color=selection))+
+  ylim(0,3)+
+  scale_color_manual(values=c("springgreen4", "red2","dodgerblue2"))
 plot(g1)
-ggsave("./testproject_XRdegen_err/kmers/kmer_points_postblast.png")
+ggsave("./testproject_XRdegen_err/kmers/kmer_points_postblast.png",width=13, height=10)
+
+
