@@ -1,0 +1,13 @@
+#Summary
+#Generated on	Thu Sep 29 22:47:59 BST 2016
+#Version	5
+chroms	1
+bases	177920
+defined	161920
+undefined	16000
+contigs	1
+scaffolds	1
+interpad	500
+source	/home/nikolai/Software/redkmer/datasimulator/X.fasta
+bytes	163971
+last modified	1475185675000
