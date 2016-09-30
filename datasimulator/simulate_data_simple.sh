@@ -15,7 +15,7 @@ pacTARGETDIR=../simulateddatasets/${DATASETID}/testreadspac/
 illTARGETDIR=../simulateddatasets/${DATASETID}/testreadsill/
 
 #size in MB
-GSIZE=0.08
+GSIZE=0.05
 MSIZE=0.01
 
 #Generate random reference chromosomes
@@ -27,14 +27,15 @@ MSIZE=0.01
 
 #X repeats
 tail X.fasta -n 2 > rep.fasta
-for ((c=0; c<=8; c++))
+for ((c=0; c<=6; c++))
 do
 cat rep.fasta rep.fasta > rep2.fasta
-cat head.text rep2.fasta > rep3.fasta
-$PY2 mutate.py rep3.fasta 0.005 > rep.fasta
-sed '1d' rep.fasta > tmpfile; mv tmpfile rep.fasta
+#cat head.text rep2.fasta > rep3.fasta
+#$PY2 mutate.py rep3.fasta 0.001 > rep.fasta
+mv rep2.fasta rep.fasta
+#sed '1d' rep.fasta > tmpfile; mv tmpfile rep.fasta
 done
-fold -w 80 rep.fasta > tmpfile; mv tmpfile rep.fasta
+#fold -w 80 rep.fasta > tmpfile; mv tmpfile rep.fasta
 cat X.fasta rep.fasta > rep2.fasta
 mv rep2.fasta X.fasta
 mv rep.fasta Xrep.fasta
@@ -47,14 +48,14 @@ cp Y.fasta $chromTARGETDIR
 #------------------------------- Illumina ------------------------------------------
 
 # error rates
-ILLsnp=0
-ILLins=0
-ILLdel=0
+ILLsnp=0.001
+ILLins=0.001
+ILLdel=0.001
 #0,001
 # length
 ILLsize=100
 # number
-ILLnum=10k
+ILLnum=8k
 
 #generate reads
 ./readgenerators/randomreads.sh ref=A.fasta out=A1.illm snprate=$ILLsnp insrate=$ILLins delrate=$ILLdel reads=$ILLnum length=$ILLsize gaussian seed=-1
@@ -79,7 +80,7 @@ cp f.fastq ${illTARGETDIR}
 #-------------------------------- Pacbio --------------------------------------------
 
 # error rates
-PACerror=0
+PACerror=0.001
 #0.001
 # coverage
 PACcov=5
