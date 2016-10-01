@@ -1,5 +1,6 @@
 #!/usr/bin/env Rscript
 library (ggplot2)
+setwd(dirname(sys.frame(1)$ofile)) 
 source("path.R")
 pacbio<-read.table(paste(Rworkdir,"/counts/pacBio_MappedReads.txt",sep=""), header=T, sep="\t")
 

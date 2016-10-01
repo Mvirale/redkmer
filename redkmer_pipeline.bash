@@ -19,11 +19,8 @@ source redkmer.cfg
 bash ${CWD}/1_redkmer_qc.bash ${runfile}
 
 bash ${CWD}/2_redkmer_pacbins.bash ${runfile}
-Rscript ${CWD}/2_redkmer.R
 
 bash ${CWD}/3_redkmer_kmers.bash ${runfile}
-Rscript ${CWD}/3_redkmer.R
 
 bash ${CWD}/4_redkmer_kmersblast.bash ${runfile}
-Rscript ${CWD}/4_redkmer.R
 
