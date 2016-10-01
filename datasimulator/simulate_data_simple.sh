@@ -22,7 +22,7 @@ MSIZE=0.01
 ./readgenerators/rangen $GSIZE > A.fasta
 ./readgenerators/rangen $GSIZE > X.fasta
 ./readgenerators/rangen $GSIZE > Y.fasta
-
+./readgenerators/rangen $MSIZE > M.fasta
 
 
 #X repeats
@@ -39,11 +39,12 @@ done
 cat X.fasta rep.fasta > rep2.fasta
 mv rep2.fasta X.fasta
 mv rep.fasta Xrep.fasta
-rm rep3.fasta
+#rm rep3.fasta
 
 cp A.fasta $chromTARGETDIR
 cp X.fasta $chromTARGETDIR
 cp Y.fasta $chromTARGETDIR
+cp M.fasta $chromTARGETDIR
 
 #------------------------------- Illumina ------------------------------------------
 
@@ -62,20 +63,23 @@ ILLnum=8k
 ./readgenerators/randomreads.sh ref=A.fasta out=A2.illm snprate=$ILLsnp insrate=$ILLins delrate=$ILLdel reads=$ILLnum length=$ILLsize gaussian seed=-1
 ./readgenerators/randomreads.sh ref=X.fasta out=X.illm snprate=$ILLsnp insrate=$ILLins delrate=$ILLdel reads=$ILLnum length=$ILLsize gaussian seed=-1
 ./readgenerators/randomreads.sh ref=Y.fasta out=Y.illm snprate=$ILLsnp insrate=$ILLins delrate=$ILLdel reads=$ILLnum length=$ILLsize gaussian seed=-1
+./readgenerators/randomreads.sh ref=M.fasta out=M.illm snprate=$ILLsnp insrate=$ILLins delrate=$ILLdel reads=$ILLnum length=$ILLsize gaussian seed=-1
 
 ./readgenerators/randomreads.sh ref=A.fasta out=A1.illf snprate=$ILLsnp insrate=$ILLins delrate=$ILLdel reads=$ILLnum length=$ILLsize gaussian seed=-1
 ./readgenerators/randomreads.sh ref=A.fasta out=A2.illf snprate=$ILLsnp insrate=$ILLins delrate=$ILLdel reads=$ILLnum length=$ILLsize gaussian seed=-1
 ./readgenerators/randomreads.sh ref=X.fasta out=X1.illf snprate=$ILLsnp insrate=$ILLins delrate=$ILLdel reads=$ILLnum length=$ILLsize gaussian seed=-1
 ./readgenerators/randomreads.sh ref=X.fasta out=X2.illf snprate=$ILLsnp insrate=$ILLins delrate=$ILLdel reads=$ILLnum length=$ILLsize gaussian seed=-1
+./readgenerators/randomreads.sh ref=M.fasta out=M1.illf snprate=$ILLsnp insrate=$ILLins delrate=$ILLdel reads=$ILLnum length=$ILLsize gaussian seed=-1
+./readgenerators/randomreads.sh ref=M.fasta out=M2.illf snprate=$ILLsnp insrate=$ILLins delrate=$ILLdel reads=$ILLnum length=$ILLsize gaussian seed=-1
 
-cat *.illm > m.fastq
-cat *.illf > f.fastq
+cat *.illm > raw_m.fastq
+cat *.illf > raw_f.fastq
 
 rm *.illm
 rm *.illf
 
-cp m.fastq ${illTARGETDIR}
-cp f.fastq ${illTARGETDIR}
+cp raw_m.fastq ${illTARGETDIR}
+cp raw_f.fastq ${illTARGETDIR}
 
 #-------------------------------- Pacbio --------------------------------------------
 
@@ -90,11 +94,13 @@ PACsize=3000
 ./readgenerators/fasta2DAM A A.fasta
 ./readgenerators/fasta2DAM X X.fasta
 ./readgenerators/fasta2DAM Y Y.fasta
+./readgenerators/fasta2DAM M M.fasta
 
 ./readgenerators/simulator A.dam -c${PACcov}. -m${PACsize} -e${PACerror} > A1.pacreads
 ./readgenerators/simulator A.dam -c${PACcov}. -m${PACsize} -e${PACerror} > A2.pacreads
 ./readgenerators/simulator X.dam -c${PACcov}. -m${PACsize} -e${PACerror} > X.pacreads
 ./readgenerators/simulator Y.dam -c${PACcov}. -m${PACsize} -e${PACerror} > Y.pacreads
+./readgenerators/simulator M.dam -c${PACcov}. -m${PACsize} -e${PACerror} > M.pacreads
 
 cat *.pacreads* > m_pac.fasta
 rm *.pacreads

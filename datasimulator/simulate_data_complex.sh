@@ -21,7 +21,7 @@ GSIZE=0.1
 MSIZE=0.01
 
 #Generate random reference chromosomes
-rm *.fasta
+
 ./readgenerators/rangen $GSIZE > A.fasta
 ./readgenerators/rangen $GSIZE > X.fasta
 ./readgenerators/rangen $GSIZE > Y.fasta
@@ -241,14 +241,14 @@ ILLnum=15k
 ./readgenerators/randomreads.sh ref=M.fasta out=M1.illf snprate=$ILLsnp insrate=$ILLins delrate=$ILLdel reads=$ILLnum length=$ILLsize gaussian seed=-1
 ./readgenerators/randomreads.sh ref=M.fasta out=M2.illf snprate=$ILLsnp insrate=$ILLins delrate=$ILLdel reads=$ILLnum length=$ILLsize gaussian seed=-1
 
-cat *.illm > m.fastq
-cat *.illf > f.fastq
+cat *.illm > raw_m.fastq
+cat *.illf > raw_f.fastq
 
 rm *.illm
 rm *.illf
 
-cp m.fastq ${illTARGETDIR}
-cp f.fastq ${illTARGETDIR}
+cp raw_m.fastq ${illTARGETDIR}
+cp raw_f.fastq ${illTARGETDIR}
 
 #-------------------------------- Pacbio --------------------------------------------
 
