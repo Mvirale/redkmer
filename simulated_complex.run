@@ -1,18 +1,16 @@
-	# path to the working directory
+	# path to the working directories
 BASEDIR=/home/nikolai/Software/redkmer
+CWD=simulateddatasets/complex
+echo "Rworkdir <- \"${BASEDIR}/${CWD}\"" > path.R
 
-CWD=/simulateddataset/complex
-
-	# path to the male pacbio read data
+	# path to the male pacbio data
 pacDIR=testreadspac
 pacM=${CWD}/${pacDIR}/m_pac.fasta
 
 	# path to the illumina data
 illDIR=testreadsill
-
-	# path to the male and female illumina reads
 illM=${CWD}/${illDIR}/m.fastq
 illF=${CWD}/${illDIR}/f.fastq
 
 	# path to the mitochondrial Reference
-#mtREF=${CWD}/MtRef.fasta
+MtREF=${CWD}/refgenome/M.fasta
