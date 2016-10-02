@@ -64,6 +64,10 @@ sort -k 1b,1 $CWD/kmers/kmer_rawdata/kmers_to_merge > tmpfile; mv tmpfile $CWD/k
 
 join -a1 -a2 -1 1 -2 1 -o '0,2.2,2.3,2.4,2.5,2.6,1.2' -e "nohits" $CWD/blast/bin_rawdata/kmers_blast_hits $CWD/kmers/kmer_rawdata/kmers_to_merge > $CWD/kmers/kmers_all_results
 
+printf "======= generating Xkmers.fasta file for off-target analysis =======\n"
+
+awk '{if ($7=="X") print $1, $2}' $CWD/kmers/kmers_all_results |awk '{print ">"$1"\n"$2}' > $CWD/kmers/Xkmers.fasta
+
 printf "======= generating kmers_all_results file =======\n"
 
 awk -v OFS="\t" '$1=$1' $CWD/kmers/kmers_all_results > tmpfile; mv tmpfile $CWD/kmers/kmers_all_results
@@ -72,3 +76,6 @@ awk -v OFS="\t" '$1=$1' $CWD/kmers/kmers_all_results > tmpfile; mv tmpfile $CWD/
 awk 'BEGIN {print "kmer_id\tseq\tfemale\tmale\tCQ\tsum\tbin"} {print}' $CWD/kmers/kmers_all_results > tmpfile; mv tmpfile $CWD/kmers/kmers_all_results
 
 printf "======= done step 4 =======\n"
+
+
+
