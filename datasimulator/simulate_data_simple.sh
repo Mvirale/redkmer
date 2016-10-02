@@ -41,6 +41,16 @@ mv rep2.fasta X.fasta
 mv rep.fasta Xrep.fasta
 #rm rep3.fasta
 
+chromname=">A"
+sed "1s/.*/${chromname}/" A.fasta > tmpfile; mv tmpfile A.fasta
+chromname=">X"
+sed "1s/.*/${chromname}/" X.fasta > tmpfile; mv tmpfile X.fasta
+chromname=">Y"
+sed "1s/.*/${chromname}/" Y.fasta > tmpfile; mv tmpfile Y.fasta
+chromname=">M"
+sed "1s/.*/${chromname}/" M.fasta > tmpfile; mv tmpfile M.fasta
+
+cat A.fasta X.fasta Y.fasta M.fasta > ${chromTARGETDIR}Genome.fasta
 cp A.fasta $chromTARGETDIR
 cp X.fasta $chromTARGETDIR
 cp Y.fasta $chromTARGETDIR

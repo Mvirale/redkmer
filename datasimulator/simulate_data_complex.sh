@@ -150,10 +150,12 @@ $PY2 mutate.py AXshared.fasta 0.005 > AXshared_X.fasta
 
 tail AXshared_A.fasta > temp.fasta; mv temp.fasta AXshared_A.fasta
 fold -w 80 AXshared_A.fasta > tmpfile; mv tmpfile AXshared_A.fasta
+sed '1d' AXshared_A.fasta > tmpfile; mv tmpfile AXshared_A.fasta
 cat A.fasta AXshared_A.fasta > tmpfile; mv tmpfile A.fasta
 
 tail AXshared_X.fasta > temp.fasta; mv temp.fasta AXshared_X.fasta
 fold -w 80 AXshared_X.fasta > tmpfile; mv tmpfile AXshared_X.fasta
+sed '1d' AXshared_X.fasta > tmpfile; mv tmpfile AXshared_X.fasta
 cat X.fasta AXshared_X.fasta > tmpfile; mv tmpfile X.fasta
 
 rm AXshared.fasta
@@ -166,10 +168,12 @@ $PY2 mutate.py AYshared.fasta 0.005 > AYshared_Y.fasta
 
 tail AYshared_A.fasta > temp.fasta; mv temp.fasta AYshared_A.fasta
 fold -w 80 AYshared_A.fasta > tmpfile; mv tmpfile AYshared_A.fasta
+sed '1d' AYshared_A.fasta > tmpfile; mv tmpfile AYshared_A.fasta
 cat A.fasta AYshared_A.fasta > tmpfile; mv tmpfile A.fasta
 
 tail AYshared_Y.fasta > temp.fasta; mv temp.fasta AYshared_Y.fasta
 fold -w 80 AYshared_Y.fasta > tmpfile; mv tmpfile AYshared_Y.fasta
+sed '1d' AYshared_Y.fasta > tmpfile; mv tmpfile AYshared_Y.fasta
 cat Y.fasta AYshared_Y.fasta > tmpfile; mv tmpfile Y.fasta
 
 rm AYshared.fasta
@@ -181,10 +185,12 @@ $PY2 mutate.py XYshared.fasta 0.005 > XYshared_Y.fasta
 
 tail XYshared_X.fasta > temp.fasta; mv temp.fasta XYshared_X.fasta
 fold -w 80 XYshared_X.fasta > tmpfile; mv tmpfile XYshared_X.fasta
+sed '1d' XYshared_X.fasta > tmpfile; mv tmpfile XYshared_X.fasta
 cat X.fasta XYshared_X.fasta > tmpfile; mv tmpfile X.fasta
 
 tail XYshared_Y.fasta > temp.fasta; mv temp.fasta XYshared_Y.fasta
 fold -w 80 XYshared_Y.fasta > tmpfile; mv tmpfile XYshared_Y.fasta
+sed '1d' XYshared_Y.fasta > tmpfile; mv tmpfile XYshared_Y.fasta
 cat Y.fasta XYshared_Y.fasta > tmpfile; mv tmpfile Y.fasta
 
 rm XYshared.fasta
@@ -197,18 +203,31 @@ $PY2 mutate.py ALLshared.fasta 0.005 > ALLshared_A.fasta
 
 tail ALLshared_X.fasta > temp.fasta; mv temp.fasta ALLshared_X.fasta
 fold -w 80 ALLshared_X.fasta > tmpfile; mv tmpfile ALLshared_X.fasta
+sed '1d' ALLshared_X.fasta > tmpfile; mv tmpfile ALLshared_X.fasta
 cat X.fasta ALLshared_X.fasta > tmpfile; mv tmpfile X.fasta
 
 tail ALLshared_Y.fasta > temp.fasta; mv temp.fasta ALLshared_Y.fasta
 fold -w 80 ALLshared_Y.fasta > tmpfile; mv tmpfile ALLshared_Y.fasta
+sed '1d' ALLshared_Y.fasta > tmpfile; mv tmpfile ALLshared_Y.fasta
 cat Y.fasta ALLshared_Y.fasta > tmpfile; mv tmpfile Y.fasta
 
 tail ALLshared_A.fasta > temp.fasta; mv temp.fasta ALLshared_A.fasta
 fold -w 80 ALLshared_A.fasta > tmpfile; mv tmpfile ALLshared_A.fasta
+sed '1d' ALLshared_A.fasta > tmpfile; mv tmpfile ALLshared_A.fasta
 cat A.fasta ALLshared_A.fasta > tmpfile; mv tmpfile A.fasta
 
 rm ALLshared.fasta
 
+chromname=">A"
+sed "1s/.*/${chromname}/" A.fasta > tmpfile; mv tmpfile A.fasta
+chromname=">X"
+sed "1s/.*/${chromname}/" X.fasta > tmpfile; mv tmpfile X.fasta
+chromname=">Y"
+sed "1s/.*/${chromname}/" Y.fasta > tmpfile; mv tmpfile Y.fasta
+chromname=">M"
+sed "1s/.*/${chromname}/" M.fasta > tmpfile; mv tmpfile M.fasta
+
+cat A.fasta X.fasta Y.fasta M.fasta > ${chromTARGETDIR}Genome.fasta
 
 
 #------------------------------- Copy reference sequences ------------------------------------------
