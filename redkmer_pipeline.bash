@@ -16,11 +16,13 @@ fi
 
 source redkmer.cfg
 
-bash ${CWD}/1_redkmer_qc.bash ${runfile}
+bash ${BASEDIR}/1_redkmer_qc.bash ${runfile}
 
-bash ${CWD}/2_redkmer_pacbins.bash ${runfile}
+bash ${BASEDIR}/2_redkmer_pacbins.bash ${runfile}
 
-bash ${CWD}/3_redkmer_kmers.bash ${runfile}
+bash ${BASEDIR}/3_redkmer_kmers.bash ${runfile}
 
-bash ${CWD}/4_redkmer_kmersblast.bash ${runfile}
+bash ${BASEDIR}/4_redkmer_kmersblast.bash ${runfile}
+
+bash ${BASEDIR}/5_redkmer_uniqueness.bash ${runfile}
 
