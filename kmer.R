@@ -43,7 +43,7 @@ kmer$selection[kmer$sum>selectSum & kmer$CQ>1.5 & kmer$bin=="X" & kmer$offtarget
 kmer$selection<-as.factor(kmer$selection)
 
 g7 <- ggplot(kmer) + geom_point(aes(x=sum, y=CQ, color=selection),alpha=0.8)+
-  scale_color_manual(values=c("red2","grey"))+
+  scale_color_manual(values=c("grey","red2"))+
   ylim(0,3)
 ggsave((paste(Rworkdir,"/kmers/kmer_analysis_7.png",sep="")),width=13, height=10)
 

@@ -18,6 +18,8 @@ source redkmer.cfg
 
 mkdir -p $CWD/kmers/scores
 
+printf "======= performing off-target analysis at 90perc (3bp mismatch) =======\n"
+
 
 $BLAST -db $CWD/blast/index/blastdb_Abin -query $CWD/kmers/Xkmers.fasta -out $CWD/kmers/scores/Xkmers_offtargets_Abin -perc_identity 90 -outfmt 6 -num_threads 2
 $BLAST -db $CWD/blast/index/blastdb_Ybin -query $CWD/kmers/Xkmers.fasta -out $CWD/kmers/scores/Xkmers_offtargets_Ybin -perc_identity 90 -outfmt 6 -num_threads 2
@@ -38,5 +40,7 @@ awk -v OFS="\t" '$1=$1' $CWD/kmers/scores/kmers_all_results_withofftargets > tmp
 awk 'BEGIN {print "kmer_id\tseq\tfemale\tmale\tCQ\tsum\tbin\tofftargets"} {print}' $CWD/kmers/scores/kmers_all_results_withofftargets > tmpfile; mv tmpfile $CWD/kmers/scores/kmers_all_results_withofftargets
 
 printf "======= done step 5 =======\n"
+
+
 
 	
