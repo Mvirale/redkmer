@@ -36,8 +36,8 @@ g6 <- ggplot(kmer) + geom_point(aes(x=sum, y=CQ, size=log10(offtargets+1),color=
   ylim(0,3)
 ggsave((paste(Rworkdir,"/kmers/kmer_analysis_6.png",sep="")),width=13, height=10)
 
-
-selectSum<-as.numeric(quantile(kmer$sum,c(.999)))
+kmersX<-subset(kmer,kmer$bin=="X")
+selectSum<-as.numeric(quantile(kmersX$sum,c(.999)))
 kmer$selection<-"bad candidates"
 kmer$selection[kmer$sum>selectSum & kmer$CQ>1.5 & kmer$bin=="X" & kmer$offtargets<1 ]<-"good kmers"
 kmer$selection<-as.factor(kmer$selection)
