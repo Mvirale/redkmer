@@ -16,13 +16,9 @@ fi
 
 source redkmer.cfg
 
-bash ${BASEDIR}/1_redkmer_qc.bash ${runfile}
-
+bash ${BASEDIR}/1_redkmer_QCandMitocleanup.bash ${runfile}
 bash ${BASEDIR}/2_redkmer_pacbins.bash ${runfile}
-
-bash ${BASEDIR}/3_redkmer_kmers.bash ${runfile}
-
+bash ${BASEDIR}/3_redkmer_kmerGenerate.bash ${runfile}
 bash ${BASEDIR}/4_redkmer_kmersblast.bash ${runfile}
-
 bash ${BASEDIR}/5_redkmer_uniqueness.bash ${runfile}
-
+bash ${BASEDIR}/6_redkmer_kmer2genome.bash ${runfile}
