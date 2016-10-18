@@ -30,8 +30,8 @@ mkdir -p $CWD/kmers/fasta/
 
 printf "======= using jellyfish to create kmers of lenght 30 from male and female illumina libraries =======\n"
 
-$JFISH count -C -L 2 -m 30 $illM -o $CWD/kmers/rawdata/m -c 3 -s 1000000000 -t 2
-$JFISH count -C -L 2 -m 30 $illF -o $CWD/kmers/rawdata/f -c 3 -s 1000000000 -t 2
+$JFISH count -C -L 2 -m 30 $illM -o $CWD/kmers/rawdata/m -c 3 -s 1000000000 -t $CORES
+$JFISH count -C -L 2 -m 30 $illF -o $CWD/kmers/rawdata/f -c 3 -s 1000000000 -t $CORES
 $JFISH dump $CWD/kmers/rawdata/m -c -L 2 -o $CWD/kmers/rawdata/m.counts
 $JFISH dump $CWD/kmers/rawdata/f -c -L 2 -o $CWD/kmers/rawdata/f.counts
 

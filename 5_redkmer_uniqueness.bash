@@ -22,8 +22,8 @@ mkdir -p $CWD/plots
 printf "======= performing off-target analysis at 90perc (3bp mismatch) =======\n"
 
 
-$BLAST -db $CWD/kmers/blast/index/blastdb_Abin -query $CWD/kmers/fasta/Xkmers.fasta -out $CWD/kmers/offtargets/Xkmers_offtargets_Abin -perc_identity 90 -outfmt 6 -num_threads 2
-$BLAST -db $CWD/kmers/blast/index/blastdb_Ybin -query $CWD/kmers/fasta/Xkmers.fasta -out $CWD/kmers/offtargets/Xkmers_offtargets_Ybin -perc_identity 90 -outfmt 6 -num_threads 2
+$BLAST -db $CWD/kmers/blast/index/blastdb_Abin -query $CWD/kmers/fasta/Xkmers.fasta -out $CWD/kmers/offtargets/Xkmers_offtargets_Abin -perc_identity 90 -outfmt 6 -num_threads $CORES
+$BLAST -db $CWD/kmers/blast/index/blastdb_Ybin -query $CWD/kmers/fasta/Xkmers.fasta -out $CWD/kmers/offtargets/Xkmers_offtargets_Ybin -perc_identity 90 -outfmt 6 -num_threads $CORES
 
 awk '{print $1}' $CWD/kmers/offtargets/Xkmers_offtargets_Abin  >  $CWD/kmers/offtargets/kmer_hits_Abin
 awk '{print $1}' $CWD/kmers/offtargets/Xkmers_offtargets_Ybin  >  $CWD/kmers/offtargets/kmer_hits_Ybin

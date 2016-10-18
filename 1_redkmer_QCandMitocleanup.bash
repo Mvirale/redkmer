@@ -31,8 +31,8 @@ mkdir -p $CWD/MitoIndex
 $BOWTIEB $MtREF $CWD/MitoIndex/MtRef
 
 # Map the Illumina data on the mito, the option  --un gives the unmapped read (not mitochondrial)
-$BOWTIE -a -p20 -v 0 $CWD/MitoIndex/MtRef ${CWD}/${illDIR}/raw_f.fastq --un ${CWD}/${illDIR}/f.fastq --al ${CWD}/${illDIR}/f_mito.fastq
-$BOWTIE -a -p20 -v 0 $CWD/MitoIndex/MtRef ${CWD}/${illDIR}/raw_m.fastq --un ${CWD}/${illDIR}/m.fastq --al ${CWD}/${illDIR}/m_mito.fastq
+$BOWTIE -a -p$CORES -v 0 $CWD/MitoIndex/MtRef ${CWD}/${illDIR}/raw_f.fastq --un ${CWD}/${illDIR}/f.fastq --al ${CWD}/${illDIR}/f_mito.fastq
+$BOWTIE -a -p$CORES -v 0 $CWD/MitoIndex/MtRef ${CWD}/${illDIR}/raw_m.fastq --un ${CWD}/${illDIR}/m.fastq --al ${CWD}/${illDIR}/m_mito.fastq
 
 
 printf "======= Done step 1 =======\n"
