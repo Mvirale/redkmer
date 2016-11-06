@@ -38,12 +38,12 @@ illnorm=$((($illLIBMsize+$illLIBFsize)/2))
 
 printf "======= Building index of pacBIO reads =======\n"
 
-# $BOWTIEB $pacM $CWD/pacBio_illmapping/index/m_pac
+$BOWTIEB $pacM $CWD/pacBio_illmapping/index/m_pac
 
 printf "======= Mapping illumina reads to pacBIO reads =======\n"
 
-#$BOWTIE -a -t -p$CORES -v 0 $CWD/pacBio_illmapping/index/m_pac --suppress 1,2,4,5,6,7,8,9 $illF 1> $CWD/pacBio_illmapping/mapping_rawdata/female.txt 2> $CWD/pacBio_illmapping/logs/female_log.txt
-#$BOWTIE -a -t -p$CORES -v 0 $CWD/pacBio_illmapping/index/m_pac --suppress 1,2,4,5,6,7,8,9 $illM 1> $CWD/pacBio_illmapping/mapping_rawdata/male.txt 2> $CWD/pacBio_illmapping/logs/male_log.txt
+$BOWTIE -a -t -p$CORES -v 0 $CWD/pacBio_illmapping/index/m_pac --suppress 1,2,4,5,6,7,8,9 $illF 1> $CWD/pacBio_illmapping/mapping_rawdata/female.txt 2> $CWD/pacBio_illmapping/logs/female_log.txt
+$BOWTIE -a -t -p$CORES -v 0 $CWD/pacBio_illmapping/index/m_pac --suppress 1,2,4,5,6,7,8,9 $illM 1> $CWD/pacBio_illmapping/mapping_rawdata/male.txt 2> $CWD/pacBio_illmapping/logs/male_log.txt
 
 printf "======= sort and counting files =======\n"
 
