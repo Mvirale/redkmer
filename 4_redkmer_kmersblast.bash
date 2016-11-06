@@ -33,11 +33,11 @@ $BLAST_DB -in $CWD/pacBio_bins/fasta/Abin.fasta -dbtype nucl -out $CWD/kmers/bla
 $BLAST_DB -in $CWD/pacBio_bins/fasta/Ybin.fasta -dbtype nucl -out $CWD/kmers/blast/index/blastdb_Ybin
 
 printf "======= Running blast against X chromosome bin =======\n"
-$BLAST -db $CWD/kmers/blast/index/blastdb_Xbin -query $kmers -out $CWD/kmers/blast/rawdata/hits_Xbin -perc_identity 100 -outfmt 6 -num_threads $CORES
+$BLAST -db $CWD/kmers/blast/index/blastdb_Xbin -query $kmers -out $CWD/kmers/blast/rawdata/hits_Xbin -perc_identity 100 -outfmt 6 -num_threads $CORES -max_target_seqs 10
 printf "======= Running blast against autosomal bin =======\n"
-$BLAST -db $CWD/kmers/blast/index/blastdb_Abin -query $kmers -out $CWD/kmers/blast/rawdata/hits_Abin -perc_identity 100 -outfmt 6 -num_threads $CORES
+$BLAST -db $CWD/kmers/blast/index/blastdb_Abin -query $kmers -out $CWD/kmers/blast/rawdata/hits_Abin -perc_identity 100 -outfmt 6 -num_threads $CORES -max_target_seqs 10
 printf "======= Running blast against Y chromosome bin =======\n"
-$BLAST -db $CWD/kmers/blast/index/blastdb_Ybin -query $kmers -out $CWD/kmers/blast/rawdata/hits_Ybin -perc_identity 100 -outfmt 6 -num_threads $CORES
+$BLAST -db $CWD/kmers/blast/index/blastdb_Ybin -query $kmers -out $CWD/kmers/blast/rawdata/hits_Ybin -perc_identity 100 -outfmt 6 -num_threads $CORES -max_target_seqs 10
 
 # add this later
 # -max_target_seqs 50000000

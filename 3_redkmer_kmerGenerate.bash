@@ -37,8 +37,12 @@ $JFISH dump $CWD/kmers/rawdata/f -c -L 2 -o $CWD/kmers/rawdata/f.counts
 
 printf "======= sorting and counting kmer libraries =======\n"
 
-sort -k1b,1 $CWD/kmers/rawdata/m.counts > $CWD/kmers/rawdata/m.sorted
-sort -k1b,1 $CWD/kmers/rawdata/f.counts > $CWD/kmers/rawdata/f.sorted
+time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/kmers/rawdata/m.counts > $CWD/kmers/rawdata/m.sorted &
+time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/kmers/rawdata/f.counts > $CWD/kmers/rawdata/f.sorted
+
+# old sort
+#sort -k1b,1 $CWD/kmers/rawdata/m.counts > $CWD/kmers/rawdata/m.sorted
+#sort -k1b,1 $CWD/kmers/rawdata/f.counts > $CWD/kmers/rawdata/f.sorted
 
 printf "======= merging kmer libraries =======\n"
 
