@@ -27,3 +27,4 @@ bash ${BASEDIR}/6_redkmer_kmer2genome.bash ${runfile}
 R CMD BATCH ${BASEDIR}/6R_analysis_kmers2genome.R
 
 
+mv *.Rout ${CWD}\plots
