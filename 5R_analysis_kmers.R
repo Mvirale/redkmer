@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 library (ggplot2)
-setwd(dirname(sys.frame(1)$ofile)) 
 source("path.R")
+setwd(dirname(Rworkdir))
 
 kmer<-read.table(paste(Rworkdir,"/kmers/kmer_results.txt",sep=""), header=T, sep="\t",stringsAsFactors=FALSE)
 

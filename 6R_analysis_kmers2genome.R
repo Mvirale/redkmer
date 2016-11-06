@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 library (ggplot2)
-setwd(dirname(sys.frame(1)$ofile)) 
 source("path.R")
+setwd(dirname(Rworkdir)) 
 
 
 kmer_to_genome<-read.table(paste(Rworkdir,"/kmers/Refgenome_blast/candidateXkmers_vs_genome",sep=""), header=T, sep="\t")

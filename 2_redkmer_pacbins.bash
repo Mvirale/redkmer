@@ -23,6 +23,16 @@ mkdir -p $CWD/pacBio_illmapping/index
 mkdir -p $CWD/pacBio_bins
 mkdir -p $CWD/pacBio_bins/fasta
 mkdir -p $CWD/temp
+mkdir -p $CWD/kmers
+mkdir -p $CWD/kmers/rawdata
+mkdir -p $CWD/kmers/fasta/
+mkdir -p $CWD/kmers/blast/
+mkdir -p $CWD/kmers/blast/index/
+mkdir -p $CWD/kmers/blast/rawdata
+mkdir -p $CWD/kmers/fasta/
+mkdir -p $CWD/kmers/offtargets
+mkdir -p $CWD/plots
+mkdir -p $CWD/kmers/Refgenome_blast
 
 ## Use this to skip sections if needed
 #if false; then

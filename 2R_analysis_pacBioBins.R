@@ -1,7 +1,8 @@
 #!/usr/bin/env Rscript
 library (ggplot2)
-setwd(dirname(sys.frame(1)$ofile)) 
 source("path.R")
+setwd(dirname(Rworkdir)) 
+
 pacbio<-read.table(paste(Rworkdir,"/pacBio_illmapping/pacBio_MappedReads.txt",sep=""), header=T, sep="\t")
 
 pacbio$candidate[pacbio$CQ>=1.5]<-"X"
