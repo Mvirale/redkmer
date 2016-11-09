@@ -57,7 +57,7 @@ $BOWTIE -a -t -p$CORES -v 0 $CWD/pacBio_illmapping/index/m_pac --suppress 1,2,4,
 
 printf "======= sort and counting files =======\n"
 
-time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/pacBio_illmapping/mapping_rawdata/female.txt | uniq -c > $CWD/pacBio_illmapping/mapping_rawdata/female_uniq &
+time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/pacBio_illmapping/mapping_rawdata/female.txt | uniq -c > $CWD/pacBio_illmapping/mapping_rawdata/female_uniq
 time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/pacBio_illmapping/mapping_rawdata/male.txt | uniq -c > $CWD/pacBio_illmapping/mapping_rawdata/male_uniq
 
 #old sort
