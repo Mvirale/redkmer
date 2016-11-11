@@ -8,7 +8,7 @@ pacbio<-read.table(paste(Rworkdir,"/pacBio_illmapping/pacBio_MappedReads.txt",se
 pacbio$bin[pacbio$CQ>=1.5]<-"X"
 pacbio$bin[pacbio$CQ<1.5]<-"A"
 pacbio$bin[pacbio$CQ<0.2]<-"Y"
-pacbio$bin[pacbio$CQ>=5]<-"GA"
+pacbio$bin[pacbio$CQ>=10]<-"GA"
 pacbio$bin<-as.factor(pacbio$bin)
 
 summary(pacbio$bin)

@@ -78,12 +78,12 @@ awk '{print $0, ($2+$3)}' $CWD/pacBio_illmapping/mapping_rawdata/merge > tmpfile
 
 printf "======= calculating LSum (Sum/length of PBreads * median PBread length  =======\n"
 
-rm -f $CWD/pacBio/m_pac.fasta.fai
+rm -f $pacM.fai
 $SAMTOOLS faidx $pacM
-awk '{print $1, $2}' $CWD/pacBio/m_pac.fasta.fai | sort -k1b,1 > $CWD/pacBio/m_pac.lengths
-join -a1 -a2 -1 1 -1 1 -o'0,2.2,1.2,1.3,1.4,1.5' -e "0" $CWD/pacBio_illmapping/mapping_rawdata/merge $CWD/pacBio/m_pac.lengths > tmpfile; mv tmpfile $CWD/pacBio_illmapping/mapping_rawdata/merge
+awk '{print $1, $2}' $pacM.fai | sort -k1b,1 > $pacM.lengths
+join -a1 -a2 -1 1 -1 1 -o'0,2.2,1.2,1.3,1.4,1.5' -e "0" $CWD/pacBio_illmapping/mapping_rawdata/merge $pacM.lengths > tmpfile; mv tmpfile $CWD/pacBio_illmapping/mapping_rawdata/merge
 
-medianlength=$(awk '{print $2}' $CWD/pacBio/m_pac.lengths | sort -n | awk '
+medianlength=$(awk '{print $2}' $pacM.lengths | sort -n | awk '
   BEGIN {
     c = 0;
     sum = 0;
@@ -108,7 +108,7 @@ awk -v ml="$medianlength" '{print $0, ($6 / $2 * ml)}' $CWD/pacBio_illmapping/ma
 
 printf "======= filter length and LSum (>=2000bp and LSum>=50)  =======\n"
 
-awk '{if($2>=2000)print $0}' $CWD/pacBio_illmapping/mapping_rawdata/merge | awk '{if ($7>=50) print $0}' > tmpfile; mv tmpfile $CWD/pacBio_illmapping/mapping_rawdata/merge 
+awk '{if($2>=2000)print $0}' $CWD/pacBio_illmapping/mapping_rawdata/merge | awk '{if ($7>=200) print $0}' > tmpfile; mv tmpfile $CWD/pacBio_illmapping/mapping_rawdata/merge 
 
 # Replace space with tabs
 awk -v OFS="\t" '$1=$1' $CWD/pacBio_illmapping/mapping_rawdata/merge > tmpfile; mv tmpfile $CWD/pacBio_illmapping/mapping_rawdata/merge
@@ -120,10 +120,10 @@ awk 'BEGIN {print "pacbio_read\tbp\tfemale\tmale\tCQ\tSum\tLSum"} {print}' $CWD/
 
 printf "======= creating chromosomal bins of pacbio reads =======\n"
 
-awk '{if($5>=1.5 && $4<5) print $1}' $CWD/pacBio_illmapping/mapping_rawdata/merge > $CWD/pacBio_bins/X_reads
-awk '{if($5<1.5 && $4>0.2) print $1}' $CWD/pacBio_illmapping/mapping_rawdata/merge > $CWD/pacBio_bins/A_reads
+awk '{if($5>=1.5 && $5<10) print $1}' $CWD/pacBio_illmapping/mapping_rawdata/merge > $CWD/pacBio_bins/X_reads
+awk '{if($5<1.5 && $5>0.2) print $1}' $CWD/pacBio_illmapping/mapping_rawdata/merge > $CWD/pacBio_bins/A_reads
 awk '{if($5<0.2) print $1}' $CWD/pacBio_illmapping/mapping_rawdata/merge > $CWD/pacBio_bins/Y_reads
-awk '{if($5>=5) print $1}' $CWD/pacBio_illmapping/mapping_rawdata/merge > $CWD/pacBio_bins/GA_reads
+awk '{if($5>=10) print $1}' $CWD/pacBio_illmapping/mapping_rawdata/merge > $CWD/pacBio_bins/GA_reads
 
 # Get sequences of pacBio bins
 
