@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 
 runfile="$1"
 if source ${runfile}; then
@@ -18,20 +18,33 @@ source redkmer.cfg
 
 mkdir -p $CWD/kmers/offtargets
 mkdir -p $CWD/plots
+mkdir -p $CWD/kmers/bowtie
+mkdir -p $CWD/kmers/bowtie/index
+mkdir -p $CWD/kmers/bowtie/mapping
+mkdir -p $CWD/kmers/bowtie/offtargets
+mkdir -p $CWD/kmers/bowtie/offtargets/logs
+
 
 printf "======= performing off-target analysis at 90perc (3bp mismatch) =======\n"
+#$BOWTIEB $CWD/pacBio_bins/fasta/Xbin.fasta $CWD/kmers/bowtie/index/Xbin &
+#$BOWTIEB $CWD/pacBio_bins/fasta/Abin.fasta $CWD/kmers/bowtie/index/Abin &
+#$BOWTIEB $CWD/pacBio_bins/fasta/Ybin.fasta $CWD/kmers/bowtie/index/Ybin &
+#$BOWTIEB $CWD/pacBio_bins/fasta/GAbin.fasta $CWD/kmers/bowtie/index/GAbin &
+
+wait $(jobs -p)
 
 
-$BLAST -db $CWD/kmers/blast/index/blastdb_Abin -query $CWD/kmers/fasta/Xkmers.fasta -out $CWD/kmers/offtargets/Xkmers_offtargets_Abin -perc_identity 90 -outfmt 6 -num_threads $CORES
-$BLAST -db $CWD/kmers/blast/index/blastdb_Ybin -query $CWD/kmers/fasta/Xkmers.fasta -out $CWD/kmers/offtargets/Xkmers_offtargets_Ybin -perc_identity 90 -outfmt 6 -num_threads $CORES
+printf "======= Mapping illumina reads to pacBIO reads =======\n"
 
-awk '{print $1}' $CWD/kmers/offtargets/Xkmers_offtargets_Abin  >  $CWD/kmers/offtargets/kmer_hits_Abin
-awk '{print $1}' $CWD/kmers/offtargets/Xkmers_offtargets_Ybin  >  $CWD/kmers/offtargets/kmer_hits_Ybin
+$BOWTIE -a -t -p$CORES -v 2 $CWD/kmers/bowtie/index/Abin --suppress 2,3,4,5,6,7,8,9 -f $CWD/kmers/fasta/Xkmers.fasta 1> $CWD/kmers/bowtie/offtargets/Abin.txt 2> $CWD/kmers/bowtie/offtargets/logs/Abin_log.txt
+$BOWTIE -a -t -p$CORES -v 2 $CWD/kmers/bowtie/index/Ybin --suppress 2,3,4,5,6,7,8,9 -f $CWD/kmers/fasta/Xkmers.fasta 1> $CWD/kmers/bowtie/offtargets/Ybin.txt 2> $CWD/kmers/bowtie/offtargets/logs/Ybin_log.txt
+$BOWTIE -a -t -p$CORES -v 2 $CWD/kmers/bowtie/index/GAbin --suppress 2,3,4,5,6,7,8,9 -f $CWD/kmers/fasta/Xkmers.fasta 1> $CWD/kmers/bowtie/offtargets/GAbin.txt 2> $CWD/kmers/bowtie/offtargets/logs/GAbin_log.txt
 
-cat $CWD/kmers/offtargets/kmer_hits_Abin $CWD/kmers/offtargets/kmer_hits_Ybin | sort -k1b,1 | uniq -c  | awk '{print $2, $1}' >  $CWD/kmers/offtargets/kmer_hits_AYbin
+
+cat $CWD/kmers/bowtie/offtargets/Abin.txt $CWD/kmers/bowtie/offtargets/Ybin.txt $CWD/kmers/bowtie/offtargets/GAbin.txt | sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G | uniq -c  | awk '{print $2, $1}' >  $CWD/kmers/bowtie/offtargets/kmer_hits_AYGAbin
 
 sed '1d' $CWD/kmers/rawdata/kmers_blastresults > tmpfile
-join -a1 -a2 -1 1 -2 1 -o '0,2.2,2.3,2.4,2.5,2.6,2.7,1.2' -e "0" $CWD/kmers/offtargets/kmer_hits_AYbin tmpfile > $CWD/kmers/kmer_results.txt; rm tmpfile
+join -a1 -a2 -1 1 -2 1 -o '0,2.2,2.3,2.4,2.5,2.6,2.7,1.2' -e "0" $CWD/kmers/bowtie/offtargets/kmer_hits_AYGAbin tmpfile > $CWD/kmers/kmer_results.txt; rm tmpfile
 
 printf "======= generating kmers_all_results_withofftargets file =======\n"
 
@@ -41,7 +54,3 @@ awk -v OFS="\t" '$1=$1' $CWD/kmers/kmer_results.txt > tmpfile; mv tmpfile $CWD/k
 awk 'BEGIN {print "kmer_id\tseq\tfemale\tmale\tCQ\tsum\tbin\tofftargets"} {print}' $CWD/kmers/kmer_results.txt > tmpfile; mv tmpfile $CWD/kmers/kmer_results.txt
 
 printf "======= done step 5 =======\n"
-
-
-
-	
