@@ -88,9 +88,9 @@ wait $(jobs -p)
 
 join -a1 -a2 -1 1 -2 1 -o '0,2.2,2.3,2.4,2.5,2.6,1.2,1.3,1.4,1.5,1.6,1.7' -e "0"  $CWD/kmers/bowtie/mapping/kmer_hits_bins $CWD/kmers/rawdata/kmers_to_merge > $CWD/kmers/rawdata/kmers_hits_results
 awk '{print $0, "0"}'  $CWD/kmers/rawdata/kmers_hits_results > tmpfile; mv tmpfile $CWD/kmers/rawdata/kmers_hits_results 
-awk '{if ($11==0) {$13="nohits"}; print}' $CWD/kmers/rawdata/kmers_hits_results > tmpfile; mv tmpfile $CWD/kmers/rawdata/kmers_hits_results
-awk -v xsi="$XSI" '{if ($12>xsi) {$13="pass"}; print}' $CWD/kmers/rawdata/kmers_hits_results > tmpfile; mv tmpfile $CWD/kmers/rawdata/kmers_hits_results
+awk -v xsi="$XSI" '{if ($12>=xsi) {$13="pass"}; print}' $CWD/kmers/rawdata/kmers_hits_results > tmpfile; mv tmpfile $CWD/kmers/rawdata/kmers_hits_results
 awk -v xsi="$XSI" '{if ($12<xsi) {$13="fail"}; print}' $CWD/kmers/rawdata/kmers_hits_results > tmpfile; mv tmpfile $CWD/kmers/rawdata/kmers_hits_results
+awk '{if ($11==0) {$13="nohits"}; print}' $CWD/kmers/rawdata/kmers_hits_results > tmpfile; mv tmpfile $CWD/kmers/rawdata/kmers_hits_results
 
 
 
