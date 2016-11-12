@@ -30,15 +30,15 @@ mkdir -p $CWD/kmers/fasta/
 
 printf "======= using jellyfish to create kmers of lenght 30 from male and female illumina libraries =======\n"
 
-#$JFISH count -C -L 2 -m 25 $illM -o $CWD/kmers/rawdata/m -c 3 -s 1000000000 -t $CORES
-#$JFISH count -C -L 2 -m 25 $illF -o $CWD/kmers/rawdata/f -c 3 -s 1000000000 -t $CORES
-#$JFISH dump $CWD/kmers/rawdata/m -c -L 2 -o $CWD/kmers/rawdata/m.counts
-#$JFISH dump $CWD/kmers/rawdata/f -c -L 2 -o $CWD/kmers/rawdata/f.counts
+$JFISH count -C -L 2 -m 25 $illM -o $CWD/kmers/rawdata/m -c 3 -s 1000000000 -t $CORES
+$JFISH count -C -L 2 -m 25 $illF -o $CWD/kmers/rawdata/f -c 3 -s 1000000000 -t $CORES
+$JFISH dump $CWD/kmers/rawdata/m -c -L 2 -o $CWD/kmers/rawdata/m.counts
+$JFISH dump $CWD/kmers/rawdata/f -c -L 2 -o $CWD/kmers/rawdata/f.counts
 
 printf "======= sorting and counting kmer libraries =======\n"
 
-#time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/kmers/rawdata/m.counts > $CWD/kmers/rawdata/m.sorted &
-#time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/kmers/rawdata/f.counts > $CWD/kmers/rawdata/f.sorted
+time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/kmers/rawdata/m.counts > $CWD/kmers/rawdata/m.sorted &
+time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/kmers/rawdata/f.counts > $CWD/kmers/rawdata/f.sorted
 
 wait $(jobs -p)
 
@@ -69,12 +69,12 @@ awk '{_div1= $4 ? ($3 / $4) : 0 ; print $0, _div1 }' $CWD/kmers/rawdata/kmers_to
 awk '{print $0, ($3+$4)}' $CWD/kmers/rawdata/kmers_to_merge > tmpfile; mv tmpfile $CWD/kmers/rawdata/kmers_to_merge
 
 #Replace space with tabs
-awk -v OFS="\t" '$1=$1' $CWD/kmers/rawdata/kmers_to_merge > tmpfile; mv tmpfile $CWD/kmers/rawdata/kmers_to_merge
+awk -v OFS="\t" '$1=$1' $CWD/kmers/rawdata/kmers_to_merge > $CWD/kmers/rawdata/kmer_counts
 
 printf "======= generating final kmer_counts file =======\n"
 
 #Add column header
-awk 'BEGIN {print "kmer_id\tseq\tfemale\tmale\tCQ\tsum"} {print}' $CWD/kmers/rawdata/kmers_to_merge > $CWD/kmers/rawdata/kmer_counts
+awk 'BEGIN {print "kmer_id\tseq\tfemale\tmale\tCQ\tsum"} {print}' $CWD/kmers/rawdata/kmer_counts > tmpfile; mv tmpfile $CWD/kmers/rawdata/kmer_counts
 
 printf "======= generating fasta file for next blast =======\n"
 

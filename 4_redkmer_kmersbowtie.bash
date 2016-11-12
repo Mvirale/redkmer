@@ -27,29 +27,35 @@ mkdir -p $CWD/kmers/bowtie/mapping/logs
 kmers=$CWD/kmers/fasta/allkmers.fasta
 
 #XSI=kmer X chromosome specificity index (0= no specificity; 1= full X specificity; 0.5= half of the kmer hits are on other chromosomes
-XSI=$0.9
+XSI=0.9
 
 
 printf "======= Creating bowtie index for PacBio bins =======\n"
 
-#$BOWTIEB $CWD/pacBio_bins/fasta/Xbin.fasta $CWD/kmers/bowtie/index/Xbin &
-#$BOWTIEB $CWD/pacBio_bins/fasta/Abin.fasta $CWD/kmers/bowtie/index/Abin &
-#$BOWTIEB $CWD/pacBio_bins/fasta/Ybin.fasta $CWD/kmers/bowtie/index/Ybin &
-#$BOWTIEB $CWD/pacBio_bins/fasta/GAbin.fasta $CWD/kmers/bowtie/index/GAbin &
+$BOWTIEB $CWD/pacBio_bins/fasta/Xbin.fasta $CWD/kmers/bowtie/index/Xbin &
+$BOWTIEB $CWD/pacBio_bins/fasta/Abin.fasta $CWD/kmers/bowtie/index/Abin &
+$BOWTIEB $CWD/pacBio_bins/fasta/Ybin.fasta $CWD/kmers/bowtie/index/Ybin &
+if [ -s "$CWD/pacBio_bins/fasta/GAbin.fasta" ];then
+$BOWTIEB $CWD/pacBio_bins/fasta/GAbin.fasta $CWD/kmers/bowtie/index/GAbin & 
+fi
 
-#wait $(jobs -p)
+wait $(jobs -p) 
 
 printf "======= Running bowtie against X chromosome bin =======\n"
-$BOWTIE -a -t -p$CORES -v 0 $CWD/kmers/bowtie/index/Xbin --suppress 2,3,4,5,6,7,8,9 -f $CWD/kmers/fasta/Xkmers.fasta 1> $CWD/kmers/bowtie/mapping/Xbin.txt 2> $CWD/kmers/bowtie/mapping/logs/Xbin_log.txt
+$BOWTIE -a -t -p$CORES -v 0 $CWD/kmers/bowtie/index/Xbin --suppress 2,3,4,5,6,7,8,9 -f $kmers  1> $CWD/kmers/bowtie/mapping/Xbin.txt 2> $CWD/kmers/bowtie/mapping/logs/Xbin_log.txt
 
 printf "======= Running bowtie against autosome bin =======\n"
-$BOWTIE -a -t -p$CORES -v 0 $CWD/kmers/bowtie/index/Abin --suppress 2,3,4,5,6,7,8,9 -f $CWD/kmers/fasta/Xkmers.fasta 1> $CWD/kmers/bowtie/mapping/Abin.txt 2> $CWD/kmers/bowtie/mapping/logs/Abin_log.txt
+$BOWTIE -a -t -p$CORES -v 0 $CWD/kmers/bowtie/index/Abin --suppress 2,3,4,5,6,7,8,9 -f $kmers 1> $CWD/kmers/bowtie/mapping/Abin.txt 2> $CWD/kmers/bowtie/mapping/logs/Abin_log.txt
 
 printf "======= Running bowtie against Y chromosome bin =======\n"
-$BOWTIE -a -t -p$CORES -v 0 $CWD/kmers/bowtie/index/Ybin --suppress 2,3,4,5,6,7,8,9 -f $CWD/kmers/fasta/Xkmers.fasta 1> $CWD/kmers/bowtie/mapping/Ybin.txt 2> $CWD/kmers/bowtie/mapping/logs/Ybin_log.txt
+$BOWTIE -a -t -p$CORES -v 0 $CWD/kmers/bowtie/index/Ybin --suppress 2,3,4,5,6,7,8,9 -f $kmers 1> $CWD/kmers/bowtie/mapping/Ybin.txt 2> $CWD/kmers/bowtie/mapping/logs/Ybin_log.txt
 
 printf "======= Running bowtie against GA chromosome bin =======\n"
-$BOWTIE -a -t -p$CORES -v 0 $CWD/kmers/bowtie/index/GAbin --suppress 2,3,4,5,6,7,8,9 -f $CWD/kmers/fasta/Xkmers.fasta 1> $CWD/kmers/bowtie/mapping/GAbin.txt 2> $CWD/kmers/bowtie/mapping/logs/GAbin_log.txt
+if [ -s "$CWD/pacBio_bins/fasta/GAbin.fasta" ];then
+$BOWTIE -a -t -p$CORES -v 0 $CWD/kmers/bowtie/index/GAbin --suppress 2,3,4,5,6,7,8,9 -f $kmers 1> $CWD/kmers/bowtie/mapping/GAbin.txt 2> $CWD/kmers/bowtie/mapping/logs/GAbin_log.txt
+else
+touch $CWD/kmers/bowtie/mapping/GAbin.txt
+fi
 
 printf "======= extracting blast results =======\n"
 
@@ -70,19 +76,22 @@ rm $CWD/kmers/bowtie/mapping/kmer_hits_XAYbin
 
 awk '{print $0, ($2+$3+$4+$5)}' $CWD/kmers/bowtie/mapping/kmer_hits_bins > tmpfile; mv tmpfile $CWD/kmers/bowtie/mapping/kmer_hits_bins
 awk '{print $0, ($2/$6)}' $CWD/kmers/bowtie/mapping/kmer_hits_bins > tmpfile; mv tmpfile $CWD/kmers/bowtie/mapping/kmer_hits_bins
-awk '{if ($6==0)print $0, "nohits"}' $CWD/kmers/bowtie/mapping/kmer_hits_bins > tmpfile; mv tmpfile $CWD/kmers/bowtie/mapping/kmer_hits_bins
-awk -v xsi="$XSI" '{if ($7>xsi) {$8=="pass"}; print}' $CWD/kmers/bowtie/mapping/kmer_hits_bins > tmpfile; mv tmpfile $CWD/kmers/bowtie/mapping/kmer_hits_bins
-awk -v xsi="$XSI" '{if ($7<xsi) {$8=="fail"}; print}' $CWD/kmers/bowtie/mapping/kmer_hits_bins > tmpfile; mv tmpfile $CWD/kmers/bowtie/mapping/kmer_hits_bins
+
 
 printf "======= merging bowtie bin results to kmer_counts data =======\n"
 
-sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/kmers/bowtie/mapping/kmer_hits_bins > tmpfile; mv tmpfile $CWD/kmers/bowtie/mapping/kmer_hits_bins &
-sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/kmers/rawdata/kmers_to_merge > tmpfile; mv tmpfile $CWD/kmers/rawdata/kmers_to_merge &
+sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/kmers/bowtie/mapping/kmer_hits_bins > tmpfile1; mv tmpfile1 $CWD/kmers/bowtie/mapping/kmer_hits_bins & 
+sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/kmers/rawdata/kmers_to_merge > tmpfile2; mv tmpfile2 $CWD/kmers/rawdata/kmers_to_merge & 
 
 wait $(jobs -p)
 
 
-join -a1 -a2 -1 1 -2 1 -o '0,2.2,2.3,2.4,2.5,2.6,1.2,1.3,1.4,1.5,1.6,1.7,1.8' -e "nohits" $CWD/kmers/bowtie/mapping/kmer_hits_bins $CWD/kmers/rawdata/kmers_to_merge > $CWD/kmers/rawdata/kmers_hits_results
+join -a1 -a2 -1 1 -2 1 -o '0,2.2,2.3,2.4,2.5,2.6,1.2,1.3,1.4,1.5,1.6,1.7' -e "0"  $CWD/kmers/bowtie/mapping/kmer_hits_bins $CWD/kmers/rawdata/kmers_to_merge > $CWD/kmers/rawdata/kmers_hits_results
+awk '{print $0, "0"}'  $CWD/kmers/rawdata/kmers_hits_results > tmpfile; mv tmpfile $CWD/kmers/rawdata/kmers_hits_results 
+awk '{if ($11==0) {$13="nohits"}; print}' $CWD/kmers/rawdata/kmers_hits_results > tmpfile; mv tmpfile $CWD/kmers/rawdata/kmers_hits_results
+awk -v xsi="$XSI" '{if ($12>xsi) {$13="pass"}; print}' $CWD/kmers/rawdata/kmers_hits_results > tmpfile; mv tmpfile $CWD/kmers/rawdata/kmers_hits_results
+awk -v xsi="$XSI" '{if ($12<xsi) {$13="fail"}; print}' $CWD/kmers/rawdata/kmers_hits_results > tmpfile; mv tmpfile $CWD/kmers/rawdata/kmers_hits_results
+
 
 
 printf "======= generating Xkmers.fasta file for off-target analysis =======\n"
