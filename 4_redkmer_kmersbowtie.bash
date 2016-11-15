@@ -2,7 +2,7 @@
 
 runfile="$1"
 if source ${runfile}; then
-printf "======= redkmer 0.2 =======\n"
+printf "======= redkmer v1.0 =======\n"
 printf "Obtained run data from ${runfile}\n"
 printf "Working Directory: ${CWD}\n"
 printf "Pacbio Read Directory: ${pacDIR}\n"
@@ -16,19 +16,8 @@ fi
 
 source redkmer.cfg
 
-mkdir -p $CWD/kmers/blast/
-mkdir -p $CWD/kmers/fasta/
-mkdir -p $CWD/kmers/bowtie
-mkdir -p $CWD/kmers/bowtie/index
-mkdir -p $CWD/kmers/bowtie/mapping
-mkdir -p $CWD/kmers/bowtie/mapping/logs
-
 
 kmers=$CWD/kmers/fasta/allkmers.fasta
-
-#XSI=kmer X chromosome specificity index (0= no specificity; 1= full X specificity; 0.5= half of the kmer hits are on other chromosomes
-XSI=0.9
-
 
 printf "======= Creating bowtie index for PacBio bins =======\n"
 
@@ -106,5 +95,14 @@ awk -v OFS="\t" '$1=$1' $CWD/kmers/rawdata/kmers_hits_results > tmpfile; mv tmpf
 awk 'BEGIN {print "kmer_id\tseq\tfemale\tmale\tCQ\tsum\thits_X\thits_A\thits_Y\thits_GA\thits_sum\tperchitsX\thits_threshold"} {print}' $CWD/kmers/rawdata/kmers_hits_results > tmpfile; mv tmpfile $CWD/kmers/rawdata/kmers_hits_results
 
 printf "======= done step 4 =======\n"
+
+
+if [[ "$EMAIL" -eq "1" ]]; then
+echo "done step 4 ${runfile}" > done4.txt
+sudo ssmtp $emailaddress < done4.txt
+rm done4.txt
+else
+echo "done step 4"
+fi
 
 

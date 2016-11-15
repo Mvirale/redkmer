@@ -2,7 +2,7 @@
 
 runfile="$1"
 if source ${runfile}; then
-printf "======= redkmer 0.1 =======\n"
+printf "======= redkmer 1.0 =======\n"
 printf "Obtained run data from ${runfile}\n"
 printf "Working Directory: ${CWD}\n"
 printf "Pacbio Read Directory: ${pacDIR}\n"
@@ -16,7 +16,30 @@ fi
 
 source redkmer.cfg
 
+echo "========== setting up =========="
+
+
 mkdir -p $CWD/QualityReports
+mkdir -p $CWD/pacBio_illmapping
+mkdir -p $CWD/pacBio_illmapping/logs
+mkdir -p $CWD/pacBio_illmapping/mapping_rawdata
+mkdir -p $CWD/pacBio_illmapping/index
+mkdir -p $CWD/pacBio_bins
+mkdir -p $CWD/pacBio_bins/fasta
+mkdir -p $CWD/temp
+mkdir -p $CWD/kmers
+mkdir -p $CWD/kmers/rawdata
+mkdir -p $CWD/kmers/fasta/
+mkdir -p $CWD/plots
+mkdir -p $CWD/kmers/Refgenome_blast
+mkdir -p $CWD/kmers/bowtie
+mkdir -p $CWD/kmers/bowtie/index
+mkdir -p $CWD/kmers/bowtie/mapping
+mkdir -p $CWD/kmers/bowtie/mapping/logs
+mkdir -p $CWD/kmers/Refgenome_blast
+mkdir -p $CWD/kmers/bowtie/offtargets
+mkdir -p $CWD/kmers/bowtie/offtargets/logs
+
 
 echo "========== producing quality report for illumina libraries =========="
 

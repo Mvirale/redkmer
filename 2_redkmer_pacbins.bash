@@ -3,7 +3,7 @@
 
 runfile="$1"
 if source ${runfile}; then
-printf "======= redkmer 0.2 =======\n"
+printf "======= redkmer v1.0 =======\n"
 printf "Obtained run data from ${runfile}\n"
 printf "Working Directory: ${CWD}\n"
 printf "Pacbio Read Directory: ${pacDIR}\n"
@@ -17,29 +17,6 @@ fi
 
 source redkmer.cfg
 
-mkdir -p $CWD/pacBio_illmapping
-mkdir -p $CWD/pacBio_illmapping/logs
-mkdir -p $CWD/pacBio_illmapping/mapping_rawdata
-mkdir -p $CWD/pacBio_illmapping/index
-mkdir -p $CWD/pacBio_bins
-mkdir -p $CWD/pacBio_bins/fasta
-mkdir -p $CWD/temp
-mkdir -p $CWD/kmers
-mkdir -p $CWD/kmers/rawdata
-mkdir -p $CWD/kmers/fasta/
-mkdir -p $CWD/kmers/blast/
-mkdir -p $CWD/kmers/blast/index/
-mkdir -p $CWD/kmers/blast/rawdata
-mkdir -p $CWD/kmers/fasta/
-mkdir -p $CWD/kmers/offtargets
-mkdir -p $CWD/plots
-mkdir -p $CWD/kmers/Refgenome_blast
-
-## Use this to skip sections if needed
-#if false; then
-## everything below "if false; then" is skipped
-#fi
-## everything below "fi" is run
 
 printf "======= calculating library sizes =======\n"
 
@@ -108,7 +85,7 @@ awk -v ml="$medianlength" '{print $0, ($6 / $2 * ml)}' $CWD/pacBio_illmapping/ma
 
 printf "======= filter length and LSum (>=2000bp and LSum>=50)  =======\n"
 
-awk '{if($2>=2000)print $0}' $CWD/pacBio_illmapping/mapping_rawdata/merge | awk '{if ($7>=200) print $0}' > tmpfile; mv tmpfile $CWD/pacBio_illmapping/mapping_rawdata/merge 
+awk -v pl="$pac_length" '{if($2>=pl)print $0}' $CWD/pacBio_illmapping/mapping_rawdata/merge | awk -v ls="$LSum" '{if ($7>=ls) print $0}' > tmpfile; mv tmpfile $CWD/pacBio_illmapping/mapping_rawdata/merge 
 
 # Replace space with tabs
 awk -v OFS="\t" '$1=$1' $CWD/pacBio_illmapping/mapping_rawdata/merge > tmpfile; mv tmpfile $CWD/pacBio_illmapping/mapping_rawdata/merge
@@ -134,3 +111,11 @@ cat $CWD/pacBio_bins/GA_reads | xargs $SAMTOOLS faidx $pacM > $CWD/pacBio_bins/f
 
 
 printf "======= done  step 2 =======\n"
+
+if [[ "$EMAIL" -eq "1" ]]; then
+echo "done step 2 ${runfile}" > done2.txt
+sudo ssmtp $emailaddress < done2.txt
+rm done2.txt
+else
+echo "done step 2"
+fi

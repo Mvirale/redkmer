@@ -2,7 +2,7 @@
 
 runfile="$1"
 if source ${runfile}; then
-printf "======= redkmer 0.2 =======\n"
+printf "======= redkmer v1.0 =======\n"
 printf "Obtained run data from ${runfile}\n"
 printf "Working Directory: ${CWD}\n"
 printf "Pacbio Read Directory: ${pacDIR}\n"
@@ -15,13 +15,6 @@ exit 0
 fi
 
 source redkmer.cfg
-mkdir -p $CWD/kmers/offtargets
-mkdir -p $CWD/plots
-mkdir -p $CWD/kmers/bowtie
-mkdir -p $CWD/kmers/bowtie/index
-mkdir -p $CWD/kmers/bowtie/mapping
-mkdir -p $CWD/kmers/bowtie/offtargets
-mkdir -p $CWD/kmers/bowtie/offtargets/logs
 
 
 printf "======= Running offtargets analysis against autosome bin 2mismatches =======\n"
@@ -33,7 +26,6 @@ $BOWTIE -a -t -p$CORES -v 2 $CWD/kmers/bowtie/index/Ybin --suppress 2,3,4,5,6,7,
 printf "======= Running offtargets analysis against GA bin 2mismatches =======\n"
 if [ -s "$CWD/pacBio_bins/fasta/GAbin.fasta" ];then
 $BOWTIE -a -t -p$CORES -v 2 $CWD/kmers/bowtie/index/GAbin --suppress 2,3,4,5,6,7,8,9 -f $CWD/kmers/fasta/Xkmers.fasta 1> $CWD/kmers/bowtie/offtargets/GAbin.txt 2> $CWD/kmers/bowtie/offtargets/logs/GAbin_log.txt
-
 else
 touch $CWD/kmers/bowtie/offtargets/GAbin.txt
 fi
@@ -51,4 +43,14 @@ awk -v OFS="\t" '$1=$1' $CWD/kmers/kmer_results.txt > tmpfile; mv tmpfile $CWD/k
 awk 'BEGIN {print "kmer_id\tseq\tfemale\tmale\tCQ\tsum\thits_X\thits_A\thits_Y\thits_GA\thits_sum\tperchitsX\thits_threshold\tofftargets"} {print}' $CWD/kmers/kmer_results.txt > tmpfile; mv tmpfile $CWD/kmers/kmer_results.txt
 
 printf "======= done step 5 =======\n"
+
+if [[ "$EMAIL" -eq "1" ]]; then
+echo "done step 5 ${runfile}" > done5.txt
+sudo ssmtp $emailaddress < done5.txt
+rm done5.txt
+else
+echo "done step 5"
+fi
+
+
 

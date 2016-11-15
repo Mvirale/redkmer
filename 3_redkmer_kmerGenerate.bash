@@ -2,7 +2,7 @@
 
 runfile="$1"
 if source ${runfile}; then
-printf "======= redkmer 0.2 =======\n"
+printf "======= redkmer v1.0 =======\n"
 printf "Obtained run data from ${runfile}\n"
 printf "Working Directory: ${CWD}\n"
 printf "Pacbio Read Directory: ${pacDIR}\n"
@@ -23,10 +23,6 @@ illLIBMsize=$(wc -l $illM | awk '{print ($1/4)}')
 illLIBFsize=$(wc -l $illF | awk '{print ($1/4)}')
 illnorm=$((($illLIBMsize+$illLIBFsize)/2))
 
-mkdir -p $CWD/kmers
-mkdir -p $CWD/kmers/rawdata
-mkdir -p $CWD/kmers/fasta/
-
 
 printf "======= using jellyfish to create kmers of lenght 30 from male and female illumina libraries =======\n"
 
@@ -38,13 +34,9 @@ $JFISH dump $CWD/kmers/rawdata/f -c -L 2 -o $CWD/kmers/rawdata/f.counts
 printf "======= sorting and counting kmer libraries =======\n"
 
 time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/kmers/rawdata/m.counts > $CWD/kmers/rawdata/m.sorted &
-time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/kmers/rawdata/f.counts > $CWD/kmers/rawdata/f.sorted
+time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/kmers/rawdata/f.counts > $CWD/kmers/rawdata/f.sorted &
 
 wait $(jobs -p)
-
-# old sort
-#sort -k1b,1 $CWD/kmers/rawdata/m.counts > $CWD/kmers/rawdata/m.sorted
-#sort -k1b,1 $CWD/kmers/rawdata/f.counts > $CWD/kmers/rawdata/f.sorted
 
 printf "======= merging kmer libraries =======\n"
 
@@ -81,13 +73,14 @@ printf "======= generating fasta file for next blast =======\n"
 # make fasta file from kmers for blast
 awk '{print ">"$1"\n"$2}' $CWD/kmers/rawdata/kmers_to_merge > $CWD/kmers/fasta/allkmers.fasta
 
-# making cutoff
-
-#awk '{if ($6 > 20) print $0}' $CWD/kmers/rawdata/kmers_to_merge > $CWD/kmers/rawdata/kmers_20cutoff
-#awk 'BEGIN {print "kmer_id\tseq\tfemale\tmale\tCQ\tsum"} {print}' $CWD/kmers/rawdata/kmers_20cutoff > $CWD/kmers/rawdata/kmer_counts_20cutoff
-#awk '{print ">"$1"\n"$2}' $CWD/kmers/rawdata/kmers_20cutoff > $CWD/kmers/fasta/kmers_20cutoff.fasta
-
-
 
 printf "======= Done step 3=======\n"
+if [[ "$EMAIL" -eq "1" ]]; then
+echo "done step 3 ${runfile}" > done3.txt
+sudo ssmtp $emailaddress < done3.txt
+rm done3.txt
+else
+echo "done step 3"
+fi
+
 

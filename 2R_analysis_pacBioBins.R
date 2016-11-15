@@ -5,10 +5,10 @@ setwd(dirname(Rworkdir))
 
 pacbio<-read.table(paste(Rworkdir,"/pacBio_illmapping/pacBio_MappedReads.txt",sep=""), header=T, sep="\t")
 
-pacbio$bin[pacbio$CQ>=1.5]<-"X"
-pacbio$bin[pacbio$CQ<1.5]<-"A"
-pacbio$bin[pacbio$CQ<0.2]<-"Y"
-pacbio$bin[pacbio$CQ>=10]<-"GA"
+pacbio$bin[pacbio$CQ>=xmin]<-"X"
+pacbio$bin[pacbio$CQ<xmin]<-"A"
+pacbio$bin[pacbio$CQ<ymax]<-"Y"
+pacbio$bin[pacbio$CQ>=xmax]<-"GA"
 pacbio$bin<-as.factor(pacbio$bin)
 
 summary(pacbio$bin)
