@@ -68,7 +68,7 @@ printf "======= making a coordinates file from genome.fasta =======\n"
 $SAMTOOLS faidx $genome
 awk '{print $1, "0", $2}' $genome.fai >  $CWD/kmers/Refgenome_blast/genome.coordinates
 awk 'BEGIN {print "chromosome\tstart\tend"} {print}' $CWD/kmers/Refgenome_blast/genome.coordinates > tmpfile; mv tmpfile $CWD/kmers/Refgenome_blast/genome.coordinates
-awk -v OFS="\t" '$1=$1' $CWD/kmers/Refgenome_blast/genome.coordinates > tmpfile; mv tmpfile $CWD/kmers/Refgenome_blast/#genome.coordinates
+awk -v OFS="\t" '$1=$1' $CWD/kmers/Refgenome_blast/genome.coordinates > tmpfile; mv tmpfile $CWD/kmers/Refgenome_blast/genome.coordinates
 
 
 
