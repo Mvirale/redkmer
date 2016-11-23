@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 runfile="$1"
 if source ${runfile}; then
 printf "======= redkmer 1.0 =======\n"
@@ -14,7 +15,7 @@ printf 'Failed to obtain run data. Exiting!\n'
 exit 0
 fi
 
-source redkmer.cfg
+source ${BASEDIR}/redkmer.cfg
 
 echo "========== setting up =========="
 
@@ -58,8 +59,8 @@ $BOWTIEB $MtREF $CWD/MitoIndex/MtRef
 
 
 # Map the Illumina data on the mito, the option  --un gives the unmapped read (not mitochondrial)
-$BOWTIE -p$CORES $CWD/MitoIndex/MtRef ${CWD}/${illDIR}/raw_f.fastq --un ${CWD}/${illDIR}/f.fastq 2> ${CWD}/${illDIR}/f_bowtie.log
-$BOWTIE -p$CORES $CWD/MitoIndex/MtRef ${CWD}/${illDIR}/raw_m.fastq --un ${CWD}/${illDIR}/m.fastq 2> ${CWD}/${illDIR}/m_bowtie.log
+$BOWTIE -p $CORES $CWD/MitoIndex/MtRef ${CWD}/${illDIR}/raw_f.fastq --un ${CWD}/${illDIR}/f.fastq 2> ${CWD}/${illDIR}/f_bowtie.log
+$BOWTIE -p $CORES $CWD/MitoIndex/MtRef ${CWD}/${illDIR}/raw_m.fastq --un ${CWD}/${illDIR}/m.fastq 2> ${CWD}/${illDIR}/m_bowtie.log
 
 
 #($BOWTIE2 -p $CORES -x $CWD/MitoIndex/MtRef_bowtie2 ${CWD}/${illDIR}/raw_f.fastq --un ${CWD}/${illDIR}/f_bowtie2.fastq) 2> ${CWD}/${illDIR}/f_bowtie2.log

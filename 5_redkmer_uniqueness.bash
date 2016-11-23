@@ -14,7 +14,7 @@ printf 'Failed to obtain run data. Exiting!\n'
 exit 0
 fi
 
-source redkmer.cfg
+source ${BASEDIR}/redkmer.cfg
 
 
 printf "======= Running offtargets analysis against autosome bin 2mismatches =======\n"

@@ -12,7 +12,7 @@ printf 'Failed to obtain run data. Exiting!\n'
 exit 0
 fi
 
-source redkmer.cfg
+source ${BASEDIR}/redkmer.cfg
 
 mkdir -p $CWD/read_analysis
 mkdir -p $CWD/read_analysis/database

@@ -15,7 +15,7 @@ printf 'Failed to obtain run data. Exiting!\n'
 exit 0
 fi
 
-source ${BASEDIR}/redkmer.cfg
+source redkmer.cfg
 
 
 printf "======= calculating library sizes =======\n"
@@ -24,19 +24,44 @@ illLIBMsize=$(wc -l $illM | awk '{print ($1/4)}')
 illLIBFsize=$(wc -l $illF | awk '{print ($1/4)}')
 illnorm=$((($illLIBMsize+$illLIBFsize)/2))
 
-printf "======= Building index of pacBIO reads =======\n"
+printf "======= Building index of pacBIO reads & Mapping illumina reads to pacBIO reads =======\n"
 
-$BOWTIEB $pacM $CWD/pacBio_illmapping/index/m_pac
+#$BOWTIEB $pacM $CWD/pacBio_illmapping/index/m_pac
 
-printf "======= Mapping illumina reads to pacBIO reads =======\n"
+#cp $pacM ${CWD}/${pacDIR}/m_pac_multiline.fasta
+#awk '/^>/ {printf("\n%s\n",$0);next; } { printf("%s",$0);}  END {printf("\n");}' < $pacM > ${CWD}/${pacDIR}/m_pac_online.fasta
+#sed '1d' ${CWD}/${pacDIR}/m_pac_online.fasta > $pacM
 
-$BOWTIE -a -t -p $CORES -v 0 $CWD/pacBio_illmapping/index/m_pac --suppress 1,2,4,5,6,7,8,9 $illF 1> $CWD/pacBio_illmapping/mapping_rawdata/female.txt 2> $CWD/pacBio_illmapping/logs/female_log.txt
-$BOWTIE -a -t -p $CORES -v 0 $CWD/pacBio_illmapping/index/m_pac --suppress 1,2,4,5,6,7,8,9 $illM 1> $CWD/pacBio_illmapping/mapping_rawdata/male.txt 2> $CWD/pacBio_illmapping/logs/male_log.txt
+rm -f $CWD/pacBio_illmapping/logs/female_log.txt
+rm -f $CWD/pacBio_illmapping/logs/male_log.txt
+rm -f $CWD/pacBio_illmapping/mapping_rawdata/female.txt
+rm -f $CWD/pacBio_illmapping/mapping_rawdata/male.txt
+
+while read pacbioname && read pacbioseq
+do
+
+nextpacbio=$pacbioname$'\n'$pacbioseq
+#echo "$nextpacbio"
+
+(
+$BOWTIEB -c "$nextpacbio" $CWD/pacBio_illmapping/index/$pacbioname
+$BOWTIE -a -t -p 2 -v 0 $CWD/pacBio_illmapping/index/$pacbioname --suppress 1,2,4,5,6,7,8,9 $illF 1>> $CWD/pacBio_illmapping/mapping_rawdata/female.txt 2>> $CWD/pacBio_illmapping/logs/female_log.txt
+$BOWTIE -a -t -p 2 -v 0 $CWD/pacBio_illmapping/index/$pacbioname --suppress 1,2,4,5,6,7,8,9 $illM 1>> $CWD/pacBio_illmapping/mapping_rawdata/male.txt 2>> $CWD/pacBio_illmapping/logs/male_log.txt
+rm $CWD/pacBio_illmapping/index/$pacbioname
+)&
+
+#$BOWTIEB -c $linekmerseq $CWD/pacBio_illmapping/index/m_pac
+#$BOWTIE -a -t -p $CORES -v 0 $CWD/pacBio_illmapping/index/m_pac --suppress 1,2,4,5,6,7,8,9 $illF 1>> $CWD/pacBio_illmapping/mapping_rawdata/female.txt 2>> $CWD/pacBio_illmapping/logs/female_log.txt
+#$BOWTIE -a -t -p $CORES -v 0 $CWD/pacBio_illmapping/index/m_pac --suppress 1,2,4,5,6,7,8,9 $illM 1>> $CWD/pacBio_illmapping/mapping_rawdata/male.txt 2>> $CWD/pacBio_illmapping/logs/male_log.txt
+
+done < $pacM
+
+exit 1
 
 printf "======= sort and counting files =======\n"
 
-time sort -k1b,1 --parallel=$LESSCORES -T $CWD/temp --buffer-size=5G $CWD/pacBio_illmapping/mapping_rawdata/female.txt | uniq -c > $CWD/pacBio_illmapping/mapping_rawdata/female_uniq
-time sort -k1b,1 --parallel=$LESSCORES -T $CWD/temp --buffer-size=5G $CWD/pacBio_illmapping/mapping_rawdata/male.txt | uniq -c > $CWD/pacBio_illmapping/mapping_rawdata/male_uniq
+time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/pacBio_illmapping/mapping_rawdata/female.txt | uniq -c > $CWD/pacBio_illmapping/mapping_rawdata/female_uniq
+time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/pacBio_illmapping/mapping_rawdata/male.txt | uniq -c > $CWD/pacBio_illmapping/mapping_rawdata/male_uniq
 
 printf "======= merging female and male pacBio_illmapping =======\n"
 

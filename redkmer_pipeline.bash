@@ -14,7 +14,7 @@ printf 'Failed to obtain run data. Exiting!\n'
 exit 0
 fi
 
-source redkmer.cfg
+source ${BASEDIR}/redkmer.cfg
 
 bash ${BASEDIR}/1_redkmer_QCandMitocleanup.bash ${runfile}
 bash ${BASEDIR}/2_redkmer_pacbins.bash ${runfile}
