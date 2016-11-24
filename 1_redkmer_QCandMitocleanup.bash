@@ -1,33 +1,17 @@
 #!/bin/bash
 #PBS -N redkmer_step1
 #PBS -l walltime=02:00:00
-#PBS -l select=1:ncpus=$CORES:mem=$MEMPERCORE
-#PBS -e $HOME
-#PBS -o $HOME
-
-
-runfile="$1"
-if source ${runfile}; then
-printf "======= redkmer 1.0 =======\n"
-printf "Obtained run data from ${runfile}\n"
-printf "Working Directory: ${CWD}\n"
-printf "Pacbio Read Directory: ${pacDIR}\n"
-printf "Illumina Read Directory: ${illDIR}\n"
-printf "Running script.\n"
-
-else
-printf 'Failed to obtain run data. Exiting!\n'
-exit 0
-fi
-
-source ${BASEDIR}/redkmer.cfg
+#PBS -l select=1:ncpus=20:mem=16gb
+#PBS -e /home/nikiwind/reports
+#PBS -o /home/nikiwind/reports
 
 if [[ "$RUNINCLUSTER" -eq "1" ]]; then
-
+source $PBS_O_WORKDIR/redkmer.cfg
 module load fastqc
 module load bowtie/1.1.1
-
 else
+source redkmer.cfg
+fi
 
 echo "========== setting up =========="
 
@@ -68,7 +52,6 @@ $BOWTIEB $MtREF $CWD/MitoIndex/MtRef
 # Map the Illumina data on the mito, the option  --un gives the unmapped read (not mitochondrial)
 $BOWTIE -p $CORES $CWD/MitoIndex/MtRef ${CWD}/${illDIR}/raw_f.fastq --un ${CWD}/${illDIR}/f.fastq 2> ${CWD}/${illDIR}/f_bowtie.log
 $BOWTIE -p $CORES $CWD/MitoIndex/MtRef ${CWD}/${illDIR}/raw_m.fastq --un ${CWD}/${illDIR}/m.fastq 2> ${CWD}/${illDIR}/m_bowtie.log
-
 #($BOWTIE2 -p $CORES -x $CWD/MitoIndex/MtRef_bowtie2 ${CWD}/${illDIR}/raw_f.fastq --un ${CWD}/${illDIR}/f_bowtie2.fastq) 2> ${CWD}/${illDIR}/f_bowtie2.log
 
 printf "======= Done step 1 =======\n"

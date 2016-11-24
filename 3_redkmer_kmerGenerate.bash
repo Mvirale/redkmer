@@ -1,21 +1,17 @@
 #!/bin/bash
+#PBS -N redkmer_step1
+#PBS -l walltime=02:00:00
+#PBS -l select=1:ncpus=20:mem=16gb
+#PBS -e /home/nikiwind/reports
+#PBS -o /home/nikiwind/reports
 
-runfile="$1"
-if source ${runfile}; then
-printf "======= redkmer v1.0 =======\n"
-printf "Obtained run data from ${runfile}\n"
-printf "Working Directory: ${CWD}\n"
-printf "Pacbio Read Directory: ${pacDIR}\n"
-printf "Illumina Read Directory: ${illDIR}\n"
-printf "Running script.\n"
-
+if [[ "$RUNINCLUSTER" -eq "1" ]]; then
+source $PBS_O_WORKDIR/redkmer.cfg
+module load samtools
+module load jellyfish
 else
-printf 'Failed to obtain run data. Exiting!\n'
-exit 0
+source redkmer.cfg
 fi
-
-source ${BASEDIR}/redkmer.cfg
-
 
 printf "======= calculating library sizes =======\n"
 
@@ -73,14 +69,5 @@ printf "======= generating fasta file for next blast =======\n"
 # make fasta file from kmers for blast
 awk '{print ">"$1"\n"$2}' $CWD/kmers/rawdata/kmers_to_merge > $CWD/kmers/fasta/allkmers.fasta
 
-
 printf "======= Done step 3=======\n"
-if [[ "$EMAIL" -eq "1" ]]; then
-echo "done step 3 ${runfile}" > done3.txt
-sudo ssmtp $emailaddress < done3.txt
-rm done3.txt
-else
-echo "done step 3"
-fi
-
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 library (ggplot2)
 library (data.table)
-source("path.R")
+source("redkmer.cfg.R")
 setwd(dirname(Rworkdir))
 
 system.time(kmer<-fread(paste(Rworkdir,"/kmers/kmer_results.txt", sep=""), header=T, sep="\t",stringsAsFactors=FALSE))

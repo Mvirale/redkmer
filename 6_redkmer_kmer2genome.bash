@@ -1,22 +1,17 @@
 #!/bin/bash
+#PBS -N redkmer_step1
+#PBS -l walltime=02:00:00
+#PBS -l select=1:ncpus=20:mem=16gb
+#PBS -e /home/nikiwind/reports
+#PBS -o /home/nikiwind/reports
 
-runfile="$1"
-if source ${runfile}; then
-printf "======= redkmer 1.0 =======\n"
-printf "Obtained run data from ${runfile}\n"
-printf "Working Directory: ${CWD}\n"
-printf "Pacbio Read Directory: ${pacDIR}\n"
-printf "Illumina Read Directory: ${illDIR}\n"
-printf "Running script.\n"
-
+if [[ "$RUNINCLUSTER" -eq "1" ]]; then
+source $PBS_O_WORKDIR/redkmer.cfg
+module load samtools
+module load bowtie/1.1.1
 else
-printf 'Failed to obtain run data. Exiting!\n'
-exit 0
+source redkmer.cfg
 fi
-
-source ${BASEDIR}/redkmer.cfg
-
-
 
 printf "======= making fasta file from targetXkmers =======\n"
 
@@ -71,14 +66,5 @@ awk 'BEGIN {print "chromosome\tstart\tend"} {print}' $CWD/kmers/Refgenome_blast/
 awk -v OFS="\t" '$1=$1' $CWD/kmers/Refgenome_blast/genome.coordinates > tmpfile; mv tmpfile $CWD/kmers/Refgenome_blast/genome.coordinates
 
 
-
 printf "======= done =======\n"
-
-if [[ "$EMAIL" -eq "1" ]]; then
-echo "done step 6 ${runfile}" > done6.txt
-sudo ssmtp $emailaddress < done6.txt
-rm done6.txt
-else
-echo "done step 6"
-fi
 

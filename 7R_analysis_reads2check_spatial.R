@@ -2,7 +2,7 @@
 library (ggplot2)
 #install.packages("reshape")
 library(reshape2)
-source("path.R")
+source("redkmer.cfg.R")
 setwd(dirname(Rworkdir)) 
 
 spatial<-read.table(paste(Rworkdir,"/read_analysis/reads2check_spatial.txt",sep=""), header=T, sep="\t")

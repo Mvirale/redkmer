@@ -1,21 +1,17 @@
 #!/bin/bash
+#PBS -N redkmer_step1
+#PBS -l walltime=02:00:00
+#PBS -l select=1:ncpus=20:mem=16gb
+#PBS -e /home/nikiwind/reports
+#PBS -o /home/nikiwind/reports
 
-runfile="$1"
-if source ${runfile}; then
-printf "======= redkmer v1.0 =======\n"
-printf "Obtained run data from ${runfile}\n"
-printf "Working Directory: ${CWD}\n"
-printf "Pacbio Read Directory: ${pacDIR}\n"
-printf "Illumina Read Directory: ${illDIR}\n"
-printf "Running script.\n"
-
+if [[ "$RUNINCLUSTER" -eq "1" ]]; then
+source $PBS_O_WORKDIR/redkmer.cfg
+module load samtools
+module load bowtie/1.1.1
 else
-printf 'Failed to obtain run data. Exiting!\n'
-exit 0
+source redkmer.cfg
 fi
-
-source ${BASEDIR}/redkmer.cfg
-
 
 kmers=$CWD/kmers/fasta/allkmers.fasta
 
@@ -95,14 +91,4 @@ awk -v OFS="\t" '$1=$1' $CWD/kmers/rawdata/kmers_hits_results > tmpfile; mv tmpf
 awk 'BEGIN {print "kmer_id\tseq\tfemale\tmale\tCQ\tsum\thits_X\thits_A\thits_Y\thits_GA\thits_sum\tperchitsX\thits_threshold"} {print}' $CWD/kmers/rawdata/kmers_hits_results > tmpfile; mv tmpfile $CWD/kmers/rawdata/kmers_hits_results
 
 printf "======= done step 4 =======\n"
-
-
-if [[ "$EMAIL" -eq "1" ]]; then
-echo "done step 4 ${runfile}" > done4.txt
-sudo ssmtp $emailaddress < done4.txt
-rm done4.txt
-else
-echo "done step 4"
-fi
-
 

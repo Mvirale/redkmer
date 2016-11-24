@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 library (ggplot2)
-source("path.R")
+source("redkmer.cfg.R")
 setwd(dirname(Rworkdir))
 
 pacbio<-read.table(paste(Rworkdir,"/pacBio_illmapping/pacBio_MappedReads.txt",sep=""), header=T, sep="\t")

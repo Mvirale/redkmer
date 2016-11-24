@@ -1,22 +1,17 @@
 #!/bin/bash
+#PBS -N redkmer_step1
+#PBS -l walltime=02:00:00
+#PBS -l select=1:ncpus=20:mem=16gb
+#PBS -e /home/nikiwind/reports
+#PBS -o /home/nikiwind/reports
 
-
-runfile="$1"
-if source ${runfile}; then
-printf "======= redkmer v1.0 =======\n"
-printf "Obtained run data from ${runfile}\n"
-printf "Working Directory: ${CWD}\n"
-printf "Pacbio Read Directory: ${pacDIR}\n"
-printf "Illumina Read Directory: ${illDIR}\n"
-printf "Running script.\n"
-
+if [[ "$RUNINCLUSTER" -eq "1" ]]; then
+source $PBS_O_WORKDIR/redkmer.cfg
+module load samtools
+module load bowtie/1.1.1
 else
-printf 'Failed to obtain run data. Exiting!\n'
-exit 0
+source redkmer.cfg
 fi
-
-source ${BASEDIR}/redkmer.cfg
-
 
 printf "======= calculating library sizes =======\n"
 
@@ -112,10 +107,3 @@ cat $CWD/pacBio_bins/GA_reads | xargs $SAMTOOLS faidx $pacM > $CWD/pacBio_bins/f
 
 printf "======= done  step 2 =======\n"
 
-if [[ "$EMAIL" -eq "1" ]]; then
-echo "done step 2 ${runfile}" > done2.txt
-sudo ssmtp $emailaddress < done2.txt
-rm done2.txt
-else
-echo "done step 2"
-fi

@@ -1,18 +1,17 @@
 #!/bin/bash
+#PBS -N redkmer_step1
+#PBS -l walltime=02:00:00
+#PBS -l select=1:ncpus=20:mem=16gb
+#PBS -e /home/nikiwind/reports
+#PBS -o /home/nikiwind/reports
 
-runfile="$1"
-if source ${runfile}; then
-printf "Obtained run data from ${runfile}\n"
-printf "Working Directory: ${CWD}\n"
-printf "Pacbio Read Directory: ${pacDIR}\n"
-printf "Running script.\n"
-
+if [[ "$RUNINCLUSTER" -eq "1" ]]; then
+source $PBS_O_WORKDIR/redkmer.cfg
+module load samtools
+module load bowtie/1.1.1
 else
-printf 'Failed to obtain run data. Exiting!\n'
-exit 0
+source redkmer.cfg
 fi
-
-source ${BASEDIR}/redkmer.cfg
 
 mkdir -p $CWD/read_analysis
 mkdir -p $CWD/read_analysis/database
