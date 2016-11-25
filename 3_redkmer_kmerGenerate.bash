@@ -1,16 +1,19 @@
 #!/bin/bash
-#PBS -N redkmer_step1
+#PBS -N redkmer_step3
 #PBS -l walltime=02:00:00
 #PBS -l select=1:ncpus=20:mem=16gb
 #PBS -e /home/nikiwind/reports
 #PBS -o /home/nikiwind/reports
 
-if [[ "$RUNINCLUSTER" -eq "1" ]]; then
+if [ -z ${PBS_ENVIRONMENT+x} ]
+then
+echo "---> running on the Perugia numbercruncher..."
+source redkmer.cfg
+else
+echo "---> running on HPC cluster..."
 source $PBS_O_WORKDIR/redkmer.cfg
 module load samtools
-module load jellyfish
-else
-source redkmer.cfg
+module load bowtie/1.1.1
 fi
 
 printf "======= calculating library sizes =======\n"

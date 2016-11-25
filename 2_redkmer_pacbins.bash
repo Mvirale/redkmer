@@ -1,16 +1,19 @@
 #!/bin/bash
-#PBS -N redkmer_step1
+#PBS -N redkmer_step2
 #PBS -l walltime=02:00:00
 #PBS -l select=1:ncpus=20:mem=16gb
 #PBS -e /home/nikiwind/reports
 #PBS -o /home/nikiwind/reports
 
-if [[ "$RUNINCLUSTER" -eq "1" ]]; then
+if [ -z ${PBS_ENVIRONMENT+x} ]
+then
+echo "---> running on the Perugia numbercruncher..."
+source redkmer.cfg
+else
+echo "---> running on HPC cluster..."
 source $PBS_O_WORKDIR/redkmer.cfg
 module load samtools
 module load bowtie/1.1.1
-else
-source redkmer.cfg
 fi
 
 printf "======= calculating library sizes =======\n"
@@ -21,17 +24,44 @@ illnorm=$((($illLIBMsize+$illLIBFsize)/2))
 
 printf "======= Building index of pacBIO reads =======\n"
 
+
+if [ -z ${PBS_ENVIRONMENT+x} ]
+then 
 $BOWTIEB $pacM $CWD/pacBio_illmapping/index/m_pac
+else
+cp $pacM $TMPDIR
+$BOWTIEB $TMPDIR/m_pac.fasta $TMPDIR/m_pac
+cp $TMPDIR/*ebwt $CWD/pacBio_illmapping/index/
+fi
+
 
 printf "======= Mapping illumina reads to pacBIO reads =======\n"
 
+if [ -z ${PBS_ENVIRONMENT+x} ]
+then 
 $BOWTIE -a -t -p $CORES -v 0 $CWD/pacBio_illmapping/index/m_pac --suppress 1,2,4,5,6,7,8,9 $illF 1> $CWD/pacBio_illmapping/mapping_rawdata/female.txt 2> $CWD/pacBio_illmapping/logs/female_log.txt
 $BOWTIE -a -t -p $CORES -v 0 $CWD/pacBio_illmapping/index/m_pac --suppress 1,2,4,5,6,7,8,9 $illM 1> $CWD/pacBio_illmapping/mapping_rawdata/male.txt 2> $CWD/pacBio_illmapping/logs/male_log.txt
+else
+cp $illF $TMPDIR
+cp $illM $TMPDIR
+$BOWTIE -a -t -p $CORES -v 0 $TMPDIR/m_pac --suppress 1,2,4,5,6,7,8,9 $TMPDIR/f.fastq 1> $TMPDIR/female.txt 2> $CWD/pacBio_illmapping/logs/female_log.txt
+$BOWTIE -a -t -p $CORES -v 0 $TMPDIR/m_pac --suppress 1,2,4,5,6,7,8,9 $TMPDIR/m.fastq 1> $TMPDIR/male.txt 2> $CWD/pacBio_illmapping/logs/male_log.txt
+fi
 
 printf "======= sort and counting files =======\n"
 
+if [ -z ${PBS_ENVIRONMENT+x} ]
+then 
 time sort -k1b,1 --parallel=$LESSCORES -T $CWD/temp --buffer-size=5G $CWD/pacBio_illmapping/mapping_rawdata/female.txt | uniq -c > $CWD/pacBio_illmapping/mapping_rawdata/female_uniq
 time sort -k1b,1 --parallel=$LESSCORES -T $CWD/temp --buffer-size=5G $CWD/pacBio_illmapping/mapping_rawdata/male.txt | uniq -c > $CWD/pacBio_illmapping/mapping_rawdata/male_uniq
+else
+
+sort -k1b,1 -T $TMPDIR/temp --buffer-size=10G $TMPDIR/female.txt | uniq -c > $TMPDIR/female_uniq
+sort -k1b,1 -T $TMPDIR/temp --buffer-size=10G $TMPDIR/male.txt | uniq -c > $TMPDIR/male_uniq
+
+cp $TMPDIR/female_uniq $CWD/pacBio_illmapping/mapping_rawdata/female_uniq
+cp $TMPDIR/male_uniq $CWD/pacBio_illmapping/mapping_rawdata/male_uniq
+fi
 
 printf "======= merging female and male pacBio_illmapping =======\n"
 
