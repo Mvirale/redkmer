@@ -5,12 +5,16 @@
 #PBS -e /home/nikiwind/reports
 #PBS -o /home/nikiwind/reports
 
-if [[ "$RUNINCLUSTER" -eq "1" ]]; then
+
+if [ -z ${PBS_ENVIRONMENT+x} ]
+then
+echo "---> running on the Perugia numbercruncher..."
+source redkmer.cfg
+else
+echo "---> running on HPC cluster..."
 source $PBS_O_WORKDIR/redkmer.cfg
 module load samtools
 module load bowtie/1.1.1
-else
-source redkmer.cfg
 fi
 
 mkdir -p $CWD/read_analysis
