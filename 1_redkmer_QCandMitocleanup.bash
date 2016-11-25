@@ -15,7 +15,7 @@ fi
 
 echo "========== setting up =========="
 
-mkdir -p $CWD/QualityReports
+mkdir -p ${CWD}/QualityReports
 mkdir -p $CWD/pacBio_illmapping
 mkdir -p $CWD/pacBio_illmapping/logs
 mkdir -p $CWD/pacBio_illmapping/mapping_rawdata
@@ -38,21 +38,21 @@ mkdir -p $CWD/kmers/bowtie/offtargets/logs
 
 echo "========== producing quality report for illumina libraries =========="
 
-$FASTQC ${CWD}/${illDIR}/raw_f.fastq -o $CWD/QualityReports/
-$FASTQC ${CWD}/${illDIR}/raw_m.fastq -o $CWD/QualityReports/
+$FASTQC ${illDIR}/raw_f.fastq -o ${CWD}/QualityReports
+$FASTQC ${illDIR}/raw_m.fastq -o ${CWD}/QualityReports
 
 echo "========== removing illumina reads mapping to mitochondrial DNA =========="
 
 mkdir -p $CWD/MitoIndex
 
 # Build the index and map the Illumina data
-$BOWTIEB $MtREF $CWD/MitoIndex/MtRef
+$BOWTIEB $MtREF ${CWD}/MitoIndex/MtRef
 #$BOWITE2B $MtREF $CWD/MitoIndex/MtRef_bowtie2
 
 # Map the Illumina data on the mito, the option  --un gives the unmapped read (not mitochondrial)
-$BOWTIE -p $CORES $CWD/MitoIndex/MtRef ${CWD}/${illDIR}/raw_f.fastq --un ${CWD}/${illDIR}/f.fastq 2> ${CWD}/${illDIR}/f_bowtie.log
-$BOWTIE -p $CORES $CWD/MitoIndex/MtRef ${CWD}/${illDIR}/raw_m.fastq --un ${CWD}/${illDIR}/m.fastq 2> ${CWD}/${illDIR}/m_bowtie.log
-#($BOWTIE2 -p $CORES -x $CWD/MitoIndex/MtRef_bowtie2 ${CWD}/${illDIR}/raw_f.fastq --un ${CWD}/${illDIR}/f_bowtie2.fastq) 2> ${CWD}/${illDIR}/f_bowtie2.log
+$BOWTIE -p $CORES $CWD/MitoIndex/MtRef ${illDIR}/raw_f.fastq --un ${illDIR}/f.fastq 2> ${illDIR}/f_bowtie.log
+$BOWTIE -p $CORES $CWD/MitoIndex/MtRef ${illDIR}/raw_m.fastq --un ${illDIR}/m.fastq 2> ${illDIR}/m_bowtie.log
+#($BOWTIE2 -p $CORES -x $CWD/MitoIndex/MtRef_bowtie2 ${CWD}/${illDIR}/raw_f.fastq --un ${illDIR}/f_bowtie2.fastq) 2> ${CWD}/${illDIR}/f_bowtie2.log
 
 printf "======= Done step 1 =======\n"
 
