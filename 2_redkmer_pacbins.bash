@@ -1,7 +1,7 @@
 #!/bin/bash
-#PBS -N redkmer_step2
+#PBS -N redkmer_2
 #PBS -l walltime=02:00:00
-#PBS -l select=1:ncpus=20:mem=16gb
+#PBS -l select=1:ncpus=16:mem=16gb
 #PBS -e /home/nikiwind/reports
 #PBS -o /home/nikiwind/reports
 
@@ -32,6 +32,7 @@ else
 cp $pacM $TMPDIR
 $BOWTIEB $TMPDIR/m_pac.fasta $TMPDIR/m_pac
 cp $TMPDIR/*ebwt $CWD/pacBio_illmapping/index/
+cp $TMPDIR/*ebwt1 $CWD/pacBio_illmapping/index/
 fi
 
 

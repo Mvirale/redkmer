@@ -1,7 +1,7 @@
 #!/bin/bash
-#PBS -N redkmer_step3
+#PBS -N redkmer3
 #PBS -l walltime=02:00:00
-#PBS -l select=1:ncpus=20:mem=16gb
+#PBS -l select=1:ncpus=16:mem=16gb
 #PBS -e /home/nikiwind/reports
 #PBS -o /home/nikiwind/reports
 
@@ -12,8 +12,8 @@ source redkmer.cfg
 else
 echo "---> running on HPC cluster..."
 source $PBS_O_WORKDIR/redkmer.cfg
-module load samtools
-module load bowtie/1.1.1
+#module load samtools
+#module load bowtie/1.1.1
 fi
 
 printf "======= calculating library sizes =======\n"
@@ -25,17 +25,34 @@ illnorm=$((($illLIBMsize+$illLIBFsize)/2))
 
 printf "======= using jellyfish to create kmers of lenght 30 from male and female illumina libraries =======\n"
 
+if [ -z ${PBS_ENVIRONMENT+x} ]
+then
 $JFISH count -C -L 2 -m 25 $illM -o $CWD/kmers/rawdata/m -c 3 -s 1000000000 -t $CORES
 $JFISH count -C -L 2 -m 25 $illF -o $CWD/kmers/rawdata/f -c 3 -s 1000000000 -t $CORES
 $JFISH dump $CWD/kmers/rawdata/m -c -L 2 -o $CWD/kmers/rawdata/m.counts
 $JFISH dump $CWD/kmers/rawdata/f -c -L 2 -o $CWD/kmers/rawdata/f.counts
+else
+cp $illM $TMPDIR
+cp $illF $TMPDIR
+$JFISH count -C -L 2 -m 25 $TMPDIR/m.fastq -o $TMPDIR/m -c 3 -s 1000000000 -t $CORES
+$JFISH count -C -L 2 -m 25 $TMPDIR/m.fastq -o $TMPDIR/f -c 3 -s 1000000000 -t $CORES
+$JFISH dump $TMPDIR/m -c -L 2 -o $TMPDIR/m.counts
+$JFISH dump $TMPDIR/f -c -L 2 -o $TMPDIR/f.counts
+fi
 
 printf "======= sorting and counting kmer libraries =======\n"
 
+if [ -z ${PBS_ENVIRONMENT+x} ]
+then 
 time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/kmers/rawdata/m.counts > $CWD/kmers/rawdata/m.sorted &
 time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/kmers/rawdata/f.counts > $CWD/kmers/rawdata/f.sorted &
-
 wait $(jobs -p)
+else
+sort -k1b,1 -T $TMPDIR/temp --buffer-size=$BUFFERSIZE $TMPDIR/m.counts > $TMPDIR/m.sorted
+sort -k1b,1 -T $TMPDIR/temp --buffer-size=$BUFFERSIZE $TMPDIR/f.counts > $TMPDIR/f.sorted
+cp $TMPDIR/m.sorted $CWD/kmers/rawdata/
+cp $TMPDIR/f.sorted $CWD/kmers/rawdata/
+fi
 
 printf "======= merging kmer libraries =======\n"
 

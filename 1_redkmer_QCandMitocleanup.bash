@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -N redkmer_step1
+#PBS -N redkmer1
 #PBS -l walltime=02:00:00
 #PBS -l select=1:ncpus=20:mem=16gb
 #PBS -e /home/nikiwind/reports
