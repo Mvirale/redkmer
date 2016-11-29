@@ -4,7 +4,7 @@ library (data.table)
 source("redkmer.cfg.R")
 setwd(dirname(Rworkdir))
 
-system.time(blast<-fread(paste(Rworkdir,"/kmers/Refgenome_blast/blast_vs_genome.txt", sep=""), header=T, sep="\t",stringsAsFactors=FALSE))
+system.time(blast<-fread(paste(Rworkdir,"/kmers/Refgenome_blast/blast_vs_genome.blast", sep=""), header=T, sep="\t",stringsAsFactors=FALSE))
 system.time(coordinates<-fread(paste(Rworkdir,"/kmers/Refgenome_blast/genome.coordinates", sep=""), header=T, sep="\t",stringsAsFactors=FALSE))
 
 g1<-ggplot()+

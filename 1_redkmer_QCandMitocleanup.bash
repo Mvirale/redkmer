@@ -19,7 +19,7 @@ fi
 
 echo "========== setting up =========="
 
-mkdir -p ${CWD}/QualityReports
+mkdir -p $CWD/QualityReports
 mkdir -p $CWD/pacBio_illmapping
 mkdir -p $CWD/pacBio_illmapping/logs
 mkdir -p $CWD/pacBio_illmapping/mapping_rawdata

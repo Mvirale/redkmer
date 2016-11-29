@@ -58,8 +58,8 @@ fi
 
 printf "======= combining data =======\n"
 
-cat $CWD/kmers/Refgenome_blast/*.txt > $CWD/kmers/Refgenome_blast/blast_vs_genome.txt
-awk 'BEGIN {print "bin_id\tqueryid\tchromosome\tidentity\talignmentlength\tmismatches\tgapopens\tq.start\tq.end\ts.start\ts.end\tevalue\tbitscore"} {print}' $CWD/kmers/Refgenome_blast/blast_vs_genome.txt > tmpfile; mv tmpfile $CWD/kmers/Refgenome_blast/blast_vs_genome.txt
+cat $CWD/kmers/Refgenome_blast/*.txt > $CWD/kmers/Refgenome_blast/blast_vs_genome.blast
+awk 'BEGIN {print "bin_id\tqueryid\tchromosome\tidentity\talignmentlength\tmismatches\tgapopens\tq.start\tq.end\ts.start\ts.end\tevalue\tbitscore"} {print}' $CWD/kmers/Refgenome_blast/blast_vs_genome.blast > tmpfile; mv tmpfile $CWD/kmers/Refgenome_blast/blast_vs_genome.blast
 
 printf "======= making a coordinates file from genome.fasta =======\n"
 
