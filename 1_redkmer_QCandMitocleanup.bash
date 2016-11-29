@@ -51,12 +51,10 @@ mkdir -p $CWD/MitoIndex
 
 # Build the index and map the Illumina data
 $BOWTIEB $MtREF ${CWD}/MitoIndex/MtRef
-#$BOWITE2B $MtREF $CWD/MitoIndex/MtRef_bowtie2
 
 # Map the Illumina data on the mito, the option  --un gives the unmapped read (not mitochondrial)
 $BOWTIE -p $CORES $CWD/MitoIndex/MtRef ${illDIR}/raw_f.fastq --un ${illDIR}/f.fastq 2> ${illDIR}/f_bowtie.log
 $BOWTIE -p $CORES $CWD/MitoIndex/MtRef ${illDIR}/raw_m.fastq --un ${illDIR}/m.fastq 2> ${illDIR}/m_bowtie.log
-#($BOWTIE2 -p $CORES -x $CWD/MitoIndex/MtRef_bowtie2 ${CWD}/${illDIR}/raw_f.fastq --un ${illDIR}/f_bowtie2.fastq) 2> ${CWD}/${illDIR}/f_bowtie2.log
 
 printf "======= Done step 1 =======\n"
 

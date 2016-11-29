@@ -12,8 +12,7 @@ source redkmer.cfg
 else
 echo "---> running on HPC cluster..."
 source $PBS_O_WORKDIR/redkmer.cfg
-#module load samtools
-#module load bowtie/1.1.1
+module load jellyfish
 fi
 
 printf "======= calculating library sizes =======\n"
@@ -35,7 +34,7 @@ else
 cp $illM $TMPDIR
 cp $illF $TMPDIR
 $JFISH count -C -L 2 -m 25 $TMPDIR/m.fastq -o $TMPDIR/m -c 3 -s 1000000000 -t $CORES
-$JFISH count -C -L 2 -m 25 $TMPDIR/m.fastq -o $TMPDIR/f -c 3 -s 1000000000 -t $CORES
+$JFISH count -C -L 2 -m 25 $TMPDIR/f.fastq -o $TMPDIR/f -c 3 -s 1000000000 -t $CORES
 $JFISH dump $TMPDIR/m -c -L 2 -o $TMPDIR/m.counts
 $JFISH dump $TMPDIR/f -c -L 2 -o $TMPDIR/f.counts
 fi
@@ -44,8 +43,8 @@ printf "======= sorting and counting kmer libraries =======\n"
 
 if [ -z ${PBS_ENVIRONMENT+x} ]
 then 
-time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/kmers/rawdata/m.counts > $CWD/kmers/rawdata/m.sorted &
-time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=5G $CWD/kmers/rawdata/f.counts > $CWD/kmers/rawdata/f.sorted &
+time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=$BUFFERSIZE $CWD/kmers/rawdata/m.counts > $CWD/kmers/rawdata/m.sorted &
+time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=$BUFFERSIZE $CWD/kmers/rawdata/f.counts > $CWD/kmers/rawdata/f.sorted &
 wait $(jobs -p)
 else
 sort -k1b,1 -T $TMPDIR/temp --buffer-size=$BUFFERSIZE $TMPDIR/m.counts > $TMPDIR/m.sorted

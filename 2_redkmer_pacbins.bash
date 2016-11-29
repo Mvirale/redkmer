@@ -26,13 +26,13 @@ printf "======= Building index of pacBIO reads =======\n"
 
 
 if [ -z ${PBS_ENVIRONMENT+x} ]
-then 
+then
 $BOWTIEB $pacM $CWD/pacBio_illmapping/index/m_pac
 else
 cp $pacM $TMPDIR
 $BOWTIEB $TMPDIR/m_pac.fasta $TMPDIR/m_pac
-cp $TMPDIR/*ebwt $CWD/pacBio_illmapping/index/
-cp $TMPDIR/*ebwt1 $CWD/pacBio_illmapping/index/
+cp $TMPDIR/*ebwt $CWD/pacBio_illmapping/index/  2>/dev/null || :
+cp $TMPDIR/*ebwtl $CWD/pacBio_illmapping/index/  2>/dev/null || :
 fi
 
 

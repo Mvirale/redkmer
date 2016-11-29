@@ -45,7 +45,7 @@ else
 	fi
 
 	cp $TMPDIR/*ebwt $CWD/kmers/bowtie/index 2>/dev/null || :
-	cp $TMPDIR/*ebwt1 $CWD/kmers/bowtie/index 2>/dev/null || :
+	cp $TMPDIR/*ebwtl $CWD/kmers/bowtie/index 2>/dev/null || :
 
 fi
 
