@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -N redkmer_step1
+#PBS -N redkmer6
 #PBS -l walltime=02:00:00
 #PBS -l select=1:ncpus=20:mem=16gb
 #PBS -e /home/nikiwind/reports
@@ -12,8 +12,8 @@ source redkmer.cfg
 else
 echo "---> running on HPC cluster..."
 source $PBS_O_WORKDIR/redkmer.cfg
+module load blast
 module load samtools
-module load bowtie/1.1.1
 fi
 
 printf "======= making fasta file from targetXkmers =======\n"

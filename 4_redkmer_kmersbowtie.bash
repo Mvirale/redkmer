@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N redkmer4
 #PBS -l walltime=02:00:00
-#PBS -l select=1:ncpus=20:mem=16gb
+#PBS -l select=1:ncpus=16:mem=16gb
 #PBS -e /home/nikiwind/reports
 #PBS -o /home/nikiwind/reports
 
@@ -14,10 +14,6 @@ echo "---> running on HPC cluster..."
 source $PBS_O_WORKDIR/redkmer.cfg
 module load samtools
 module load bowtie/1.1.1
-
-# This finds out the number of nodes we have
-NP=$(wc -l $PBS_NODEFILE | awk '{print $1}')
-echo "Total CPU count = $NP"
 
 fi
 

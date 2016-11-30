@@ -8,7 +8,7 @@
 module purge
 module load R
 
-cd $PBS_O_WORKDIR/
+cd /work/nikiwind/redkmer
 
 R CMD BATCH --no-save --no-restore 2R_analysis_pacBioBins.R
 #R CMD BATCH --no-save --no-restore 5R_analysis_kmers.R
