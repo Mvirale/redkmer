@@ -1,5 +1,6 @@
 #!/usr/bin/env Rscript
 library (ggplot2)
+install.packages("data.table", repos="http://cran.r-project.org")
 library (data.table)
 source("redkmer.cfg.R")
 setwd(dirname(Rworkdir))

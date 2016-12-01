@@ -1,9 +1,10 @@
 #!/bin/bash
 #PBS -N redkmer1
 #PBS -l walltime=02:00:00
-#PBS -l select=1:ncpus=20:mem=16gb
+#PBS -l select=1:ncpus=24:mem=16gb:tmpspace=300gb
 #PBS -e /home/nikiwind/reports
 #PBS -o /home/nikiwind/reports
+
 
 if [ -z ${PBS_ENVIRONMENT+x} ]
 then
@@ -14,6 +15,7 @@ echo "---> running on HPC cluster..."
 source $PBS_O_WORKDIR/redkmer.cfg
 module load fastqc
 module load bowtie/1.1.1
+
 fi
 
 
@@ -49,12 +51,32 @@ echo "========== removing illumina reads mapping to mitochondrial DNA ==========
 
 mkdir -p $CWD/MitoIndex
 
+if [ -z ${PBS_ENVIRONMENT+x} ]
+then
+
 # Build the index and map the Illumina data
 $BOWTIEB $MtREF ${CWD}/MitoIndex/MtRef
 
 # Map the Illumina data on the mito, the option  --un gives the unmapped read (not mitochondrial)
 $BOWTIE -p $CORES $CWD/MitoIndex/MtRef ${illDIR}/raw_f.fastq --un ${illDIR}/f.fastq 2> ${illDIR}/f_bowtie.log
 $BOWTIE -p $CORES $CWD/MitoIndex/MtRef ${illDIR}/raw_m.fastq --un ${illDIR}/m.fastq 2> ${illDIR}/m_bowtie.log
+
+else
+
+cp ${illDIR}/raw_f.fastq $TMPDIR/raw_f.fastq
+cp ${illDIR}/raw_m.fastq $TMPDIR/raw_m.fastq
+
+$BOWTIEB $MtREF ${CWD}/MitoIndex/MtRef
+
+$BOWTIE -p $CORES $CWD/MitoIndex/MtRef $TMPDIR/raw_f.fastq --un $TMPDIR/f.fastq 2> ${illDIR}/f_bowtie.log
+$BOWTIE -p $CORES $CWD/MitoIndex/MtRef $TMPDIR/raw_m.fastq --un $TMPDIR/m.fastq 2> ${illDIR}/m_bowtie.log
+
+cp $TMPDIR/f.fastq ${illDIR}
+cp $TMPDIR/m.fastq ${illDIR}
+
+
+fi
+
 
 printf "======= Done step 1 =======\n"
 
