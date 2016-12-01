@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N redkmer1
-#PBS -l walltime=02:00:00
-#PBS -l select=1:ncpus=24:mem=16gb:tmpspace=300gb
+#PBS -l walltime=24:00:00
+#PBS -l select=1:ncpus=24:mem=16gb:tmpspace=500gb
 #PBS -e /home/nikiwind/reports
 #PBS -o /home/nikiwind/reports
 
@@ -21,6 +21,7 @@ fi
 
 echo "========== setting up =========="
 
+mkdir -p $CWD/qsubscripts
 mkdir -p $CWD/QualityReports
 mkdir -p $CWD/pacBio_illmapping
 mkdir -p $CWD/pacBio_illmapping/logs
@@ -41,6 +42,7 @@ mkdir -p $CWD/kmers/bowtie/mapping/logs
 mkdir -p $CWD/kmers/Refgenome_blast
 mkdir -p $CWD/kmers/bowtie/offtargets
 mkdir -p $CWD/kmers/bowtie/offtargets/logs
+mkdir -p $CWD/MitoIndex
 
 echo "========== producing quality report for illumina libraries =========="
 
@@ -49,7 +51,6 @@ $FASTQC ${illDIR}/raw_m.fastq -o ${CWD}/QualityReports
 
 echo "========== removing illumina reads mapping to mitochondrial DNA =========="
 
-mkdir -p $CWD/MitoIndex
 
 if [ -z ${PBS_ENVIRONMENT+x} ]
 then
@@ -66,14 +67,14 @@ else
 cp ${illDIR}/raw_f.fastq $TMPDIR/raw_f.fastq
 cp ${illDIR}/raw_m.fastq $TMPDIR/raw_m.fastq
 
-$BOWTIEB $MtREF ${CWD}/MitoIndex/MtRef
+#$BOWTIEB $MtREF ${CWD}/MitoIndex/MtRef
 
 $BOWTIE -p $CORES $CWD/MitoIndex/MtRef $TMPDIR/raw_f.fastq --un $TMPDIR/f.fastq 2> ${illDIR}/f_bowtie.log
-$BOWTIE -p $CORES $CWD/MitoIndex/MtRef $TMPDIR/raw_m.fastq --un $TMPDIR/m.fastq 2> ${illDIR}/m_bowtie.log
-
 cp $TMPDIR/f.fastq ${illDIR}
-cp $TMPDIR/m.fastq ${illDIR}
+rm $TMPDIR/f.fastq
 
+$BOWTIE -p $CORES $CWD/MitoIndex/MtRef $TMPDIR/raw_m.fastq --un $TMPDIR/m.fastq 2> ${illDIR}/m_bowtie.log
+cp $TMPDIR/m.fastq ${illDIR}
 
 fi
 

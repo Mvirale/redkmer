@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N redkmer2
-#PBS -l walltime=02:00:00
-#PBS -l select=1:ncpus=16:mem=16gb
+#PBS -l walltime=72:00:00
+#PBS -l select=1:ncpus=24:mem=16gb:tmpspace=200gb
 #PBS -e /home/nikiwind/reports
 #PBS -o /home/nikiwind/reports
 
@@ -27,12 +27,12 @@ printf "======= Building index of pacBIO reads =======\n"
 
 if [ -z ${PBS_ENVIRONMENT+x} ]
 then
-$BOWTIEB $pacM $CWD/pacBio_illmapping/index/m_pac
+	$BOWTIEB $pacM $CWD/pacBio_illmapping/index/m_pac
 else
-cp $pacM $TMPDIR
-$BOWTIEB $TMPDIR/m_pac.fasta $TMPDIR/m_pac
-cp $TMPDIR/*ebwt $CWD/pacBio_illmapping/index/  2>/dev/null || :
-cp $TMPDIR/*ebwtl $CWD/pacBio_illmapping/index/  2>/dev/null || :
+	cp $pacM $TMPDIR
+	$BOWTIEB $TMPDIR/m_pac.fasta $TMPDIR/m_pac
+	cp $TMPDIR/*ebwt $CWD/pacBio_illmapping/index/  2>/dev/null || :
+	cp $TMPDIR/*ebwtl $CWD/pacBio_illmapping/index/  2>/dev/null || :
 fi
 
 
@@ -42,17 +42,9 @@ if [ -z ${PBS_ENVIRONMENT+x} ]
 then 
 	$BOWTIE -a -t -p $CORES -v 0 $CWD/pacBio_illmapping/index/m_pac --suppress 1,2,4,5,6,7,8,9 $illF 1> $CWD/pacBio_illmapping/mapping_rawdata/female.txt 2> $CWD/pacBio_illmapping/logs/female_log.txt
 	$BOWTIE -a -t -p $CORES -v 0 $CWD/pacBio_illmapping/index/m_pac --suppress 1,2,4,5,6,7,8,9 $illM 1> $CWD/pacBio_illmapping/mapping_rawdata/male.txt 2> $CWD/pacBio_illmapping/logs/male_log.txt
-else
-	cp $illF $TMPDIR
-	cp $illM $TMPDIR
-	$BOWTIE -a -t -p $CORES -v 0 $TMPDIR/m_pac --suppress 1,2,4,5,6,7,8,9 $TMPDIR/f.fastq 1> $TMPDIR/female.txt 2> $CWD/pacBio_illmapping/logs/female_log.txt
-	$BOWTIE -a -t -p $CORES -v 0 $TMPDIR/m_pac --suppress 1,2,4,5,6,7,8,9 $TMPDIR/m.fastq 1> $TMPDIR/male.txt 2> $CWD/pacBio_illmapping/logs/male_log.txt
-fi
 
-printf "======= sort and counting files =======\n"
-
-if [ -z ${PBS_ENVIRONMENT+x} ]
-then 
+	printf "======= sort and counting files =======\n"
+	
 	split --number=l/$CORES $CWD/pacBio_illmapping/mapping_rawdata/female.txt $CWD/pacBio_illmapping/mapping_rawdata/_sorttmp;
 	ls -1 $CWD/pacBio_illmapping/mapping_rawdata/_sorttmp* | (while read SORTFILE; do sort -k1b,1 $SORTFILE -o $SORTFILE & done;
 	wait
@@ -67,30 +59,80 @@ then
 	sort -m $CWD/pacBio_illmapping/mapping_rawdata/_sorttmp* | uniq -c > $CWD/pacBio_illmapping/mapping_rawdata/male_uniq
 	rm $CWD/pacBio_illmapping/mapping_rawdata/_sorttmp*
 	
-	#time sort -k1b,1 --parallel=$LESSCORES -T $CWD/temp --buffer-size=5G $CWD/pacBio_illmapping/mapping_rawdata/female.txt | uniq -c > $CWD/pacBio_illmapping/mapping_rawdata/female_uniq
-	#time sort -k1b,1 --parallel=$LESSCORES -T $CWD/temp --buffer-size=5G $CWD/pacBio_illmapping/mapping_rawdata/male.txt | uniq -c > $CWD/pacBio_illmapping/mapping_rawdata/male_uniq
-	
 else
 
-	split --number=l/$CORES $TMPDIR/female.txt $TMPDIR/_sorttmp;
-	ls -1 $TMPDIR/_sorttmp* | (while read SORTFILE; do sort -k1b,1 -T $TMPDIR/temp $SORTFILE -o $SORTFILE & done;
-	wait
-	)
-	sort -m $TMPDIR/_sorttmp* | uniq -c > $TMPDIR/female_uniq
-	rm $TMPDIR/_sorttmp*
+cat > ${CWD}/qsubscripts/malepacbins.bash <<EOF
+#!/bin/bash
+#PBS -N redkmer_m_pacb
+#PBS -l walltime=72:00:00
+#PBS -l select=1:ncpus=24:mem=32gb:tmpspace=300gb
+#PBS -e /home/nikiwind/reports
+#PBS -o /home/nikiwind/reports
+module load bowtie/1.1.1
 
-	split --number=l/$CORES $TMPDIR/male.txt $TMPDIR/_sorttmp;
-	ls -1 $TMPDIR/_sorttmp* | (while read SORTFILE; do sort -k1b,1 -T $TMPDIR/temp $SORTFILE -o $SORTFILE & done;
-	wait
-	)
-	sort -m $TMPDIR/_sorttmp* | uniq -c > $TMPDIR/male_uniq
-	rm $CWD/pacBio_illmapping/mapping_rawdata/_sorttmp*
+	echo "==================================== Working on male pacbins ======================================="
+		cp $illM XXXXX
+		$BOWTIE -a -t -p $CORES -v 0 $CWD/pacBio_illmapping/index/m_pac --suppress 1,2,4,5,6,7,8,9 XXXXX/m.fastq 1> XXXXX/male.txt 2> $CWD/pacBio_illmapping/logs/male_log.txt
 
-	#sort -k1b,1 -T $TMPDIR/temp --buffer-size=10G $TMPDIR/female.txt | uniq -c > $TMPDIR/female_uniq
-	#sort -k1b,1 -T $TMPDIR/temp --buffer-size=10G $TMPDIR/male.txt | uniq -c > $TMPDIR/male_uniq
+	echo "==================================== Done male pacbins, sorting ===================================="
 
-	cp $TMPDIR/female_uniq $CWD/pacBio_illmapping/mapping_rawdata/female_uniq
-	cp $TMPDIR/male_uniq $CWD/pacBio_illmapping/mapping_rawdata/male_uniq
+		split --number=l/$CORES XXXXX/male.txt XXXXX/_sorttmp;
+		ls -1 XXXXX/_sorttmp* | (while read SORTFILE; do sort -k1b,1 -T XXXXX/temp YYYYY -o YYYYY & done;
+		wait
+		)
+		sort -m XXXXX/_sorttmp* | uniq -c > XXXXX/male_uniq
+		cp XXXXX/male_uniq $CWD/pacBio_illmapping/mapping_rawdata/male_uniq
+
+	echo "==================================== Done sorting ! ===================================="
+EOF
+
+sed 's/XXXXX/$TMPDIR/g' ${CWD}/qsubscripts/malepacbins.bash > ${CWD}/qsubscripts/malepacbins.bashX
+sed 's/YYYYY/$SORTFILE/g' ${CWD}/qsubscripts/malepacbins.bashX > ${CWD}/qsubscripts/malepacbins.bash
+
+
+cat > ${CWD}/qsubscripts/femalepacbins.bash <<EOF
+#!/bin/bash
+#PBS -N redkmer_f_pacb
+#PBS -l walltime=72:00:00
+#PBS -l select=1:ncpus=24:mem=32gb:tmpspace=300gb
+#PBS -e /home/nikiwind/reports
+#PBS -o /home/nikiwind/reports
+module load bowtie/1.1.1
+
+	echo "==================================== Working on female pacbins ======================================="
+		cp $illF XXXXX
+		$BOWTIE -a -t -p $CORES -v 0 $CWD/pacBio_illmapping/index/m_pac --suppress 1,2,4,5,6,7,8,9 XXXXX/f.fastq 1> XXXXX/female.txt 2> $CWD/pacBio_illmapping/logs/female_log.txt
+
+	echo "==================================== Done female pacbins, sorting ===================================="
+
+		split --number=l/$CORES XXXXX/female.txt XXXXX/_sorttmp;
+		ls -1 XXXXX/_sorttmp* | (while read SORTFILE; do sort -k1b,1 -T XXXXX/temp YYYYY -o YYYYY & done;
+		wait
+		)
+		sort -m XXXXX/_sorttmp* | uniq -c > XXXXX/female_uniq
+		cp XXXXX/female_uniq $CWD/pacBio_illmapping/mapping_rawdata/female_uniq
+
+	echo "==================================== Done sorting ! ===================================="
+
+EOF
+
+sed 's/XXXXX/$TMPDIR/g' ${CWD}/qsubscripts/femalepacbins.bash > ${CWD}/qsubscripts/femalepacbins.bashX
+sed 's/YYYYY/$SORTFILE/g' ${CWD}/qsubscripts/femalepacbins.bashX > ${CWD}/qsubscripts/femalepacbins.bash
+
+
+	MALEJOB=$(qsub ${CWD}/qsubscripts/malepacbins.bash)
+	echo $MALEJOB
+	FEMALEJOB=$(qsub ${CWD}/qsubscripts/femalepacbins.bash)
+	echo $FEMALEJOB	
+	
+	while qstat $FEMALEJOB &> /dev/null; do
+	    sleep 90;
+	done;
+
+	while qstat $MALEJOB &> /dev/null; do
+	    sleep 90;
+	done;
+
 fi
 
 printf "======= merging female and male pacBio_illmapping =======\n"
