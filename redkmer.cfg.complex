@@ -8,14 +8,14 @@ printf "======= Running Redkmer =======\n"
 #BASEDIR=/media/nikolai/DATADRIVE1/BioTools/redkmer
 BASEDIR=/work/nikiwind/redkmer
 
-CWD=/work/nikiwind/redkmerdatasets/ceratitis
+CWD=/work/nikiwind/redkmer/simulateddatasets/complex
 
 # path to the male pacbio data
-pacDIR=/work/nikiwind/redkmerdatasets/ceratitis/reads/pacbio
+pacDIR=/work/nikiwind/redkmer/simulateddatasets/complex/testreadspac
 pacM=${pacDIR}/m_pac.fasta
 
 # path to the illumina data
-illDIR=/work/nikiwind/redkmerdatasets/ceratitis/reads/illumina
+illDIR=/work/nikiwind/redkmer/simulateddatasets/complex/testreadsill
 illM=${illDIR}/m.fastq
 illF=${illDIR}/f.fastq
 
@@ -52,7 +52,7 @@ echo "ymax <-"$ymax"" >> ${BASEDIR}/Rscripts/redkmer.cfg.R
 #---------------------------------- Machine specific configuration ---------------------------------------------------------------
 
 # number of CPUs and memory to use
-CORES=24
+CORES=16
 LESSCORES=8
 BUFFERSIZE=10G
 
@@ -68,7 +68,6 @@ BLAST=blastn
 FASTQC=fastqc
 BLAST_DB=makeblastdb
 BEDTOOLS=bedtools
-
 
 echo "RUNNING...."
 

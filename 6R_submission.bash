@@ -10,7 +10,7 @@ module load R
 
 export R_LIBS="/home/nikiwind/localRlibs"
 
-cd $PBS_O_WORKDIR/
+cd $PBS_O_WORKDIR/Rscripts/
 
 R CMD BATCH --no-save --no-restore 6R_analysis_kmers2genome.R
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N redkmer1
-#PBS -l walltime=24:00:00
-#PBS -l select=1:ncpus=24:mem=16gb:tmpspace=500gb
+#PBS -l walltime=72:00:00
+#PBS -l select=1:ncpus=24:mem=16gb:tmpspace=100gb
 #PBS -e /home/nikiwind/reports
 #PBS -o /home/nikiwind/reports
 
@@ -13,9 +13,7 @@ source redkmer.cfg
 else
 echo "---> running on HPC cluster..."
 source $PBS_O_WORKDIR/redkmer.cfg
-module load fastqc
 module load bowtie/1.1.1
-
 fi
 
 
@@ -44,39 +42,86 @@ mkdir -p $CWD/kmers/bowtie/offtargets
 mkdir -p $CWD/kmers/bowtie/offtargets/logs
 mkdir -p $CWD/MitoIndex
 
-echo "========== producing quality report for illumina libraries =========="
-
-$FASTQC ${illDIR}/raw_f.fastq -o ${CWD}/QualityReports
-$FASTQC ${illDIR}/raw_m.fastq -o ${CWD}/QualityReports
-
-echo "========== removing illumina reads mapping to mitochondrial DNA =========="
-
 
 if [ -z ${PBS_ENVIRONMENT+x} ]
 then
-
-# Build the index and map the Illumina data
-$BOWTIEB $MtREF ${CWD}/MitoIndex/MtRef
-
-# Map the Illumina data on the mito, the option  --un gives the unmapped read (not mitochondrial)
-$BOWTIE -p $CORES $CWD/MitoIndex/MtRef ${illDIR}/raw_f.fastq --un ${illDIR}/f.fastq 2> ${illDIR}/f_bowtie.log
-$BOWTIE -p $CORES $CWD/MitoIndex/MtRef ${illDIR}/raw_m.fastq --un ${illDIR}/m.fastq 2> ${illDIR}/m_bowtie.log
-
+	# Build the index and map the Illumina data
+	$BOWTIEB $MtREF ${CWD}/MitoIndex/MtRef
+	# Map the Illumina data on the mito, the option  --un gives the unmapped read (not mitochondrial)
+	$BOWTIE -p $CORES $CWD/MitoIndex/MtRef ${illDIR}/raw_f.fastq --un ${illDIR}/f.fastq 2> ${illDIR}/f_bowtie.log
+	$BOWTIE -p $CORES $CWD/MitoIndex/MtRef ${illDIR}/raw_m.fastq --un ${illDIR}/m.fastq 2> ${illDIR}/m_bowtie.log
 else
 
-cp ${illDIR}/raw_f.fastq $TMPDIR/raw_f.fastq
-cp ${illDIR}/raw_m.fastq $TMPDIR/raw_m.fastq
+echo "========== generating mitochondrial index =========="
 
-#$BOWTIEB $MtREF ${CWD}/MitoIndex/MtRef
+$BOWTIEB $MtREF ${CWD}/MitoIndex/MtRef
 
-$BOWTIE -p $CORES $CWD/MitoIndex/MtRef $TMPDIR/raw_f.fastq --un $TMPDIR/f.fastq 2> ${illDIR}/f_bowtie.log
-cp $TMPDIR/f.fastq ${illDIR}
-rm $TMPDIR/f.fastq
+cat > ${CWD}/qsubscripts/femalemito.bashX <<EOF
+#!/bin/bash
+#PBS -N redkmer_f_mito
+#PBS -l walltime=72:00:00
+#PBS -l select=1:ncpus=24:mem=32gb:tmpspace=500gb
+#PBS -e /home/nikiwind/reports
+#PBS -o /home/nikiwind/reports
+module load bowtie/1.1.1
+module load fastqc
 
-$BOWTIE -p $CORES $CWD/MitoIndex/MtRef $TMPDIR/raw_m.fastq --un $TMPDIR/m.fastq 2> ${illDIR}/m_bowtie.log
-cp $TMPDIR/m.fastq ${illDIR}
+cp ${illDIR}/raw_f.fastq XXXXX/raw_f.fastq
+echo "========== producing quality report for female illumina library =========="
+$FASTQC XXXXX/raw_f.fastq -o ${CWD}/QualityReports
+echo "========== removing female illumina reads mapping to mitochondrial DNA =========="
+$BOWTIE -p $CORES $CWD/MitoIndex/MtRef XXXXX/raw_f.fastq --un XXXXX/f.fastq 2> ${illDIR}/f_bowtie.log
+cp XXXXX/f.fastq ${illDIR}
+	
+EOF
+sed 's/XXXXX/$TMPDIR/g' ${CWD}/qsubscripts/femalemito.bashX > ${CWD}/qsubscripts/femalemito.bash
+
+
+cat > ${CWD}/qsubscripts/malemito.bashX <<EOF
+#!/bin/bash
+#PBS -N redkmer_m_mito
+#PBS -l walltime=72:00:00
+#PBS -l select=1:ncpus=24:mem=32gb:tmpspace=500gb
+#PBS -e /home/nikiwind/reports
+#PBS -o /home/nikiwind/reports
+module load bowtie/1.1.1
+module load fastqc
+
+cp ${illDIR}/raw_m.fastq XXXXX/raw_m.fastq
+echo "========== producing quality report for male illumina library =========="
+$FASTQC XXXXX/raw_m.fastq -o ${CWD}/QualityReports
+echo "========== removing male illumina reads mapping to mitochondrial DNA =========="
+$BOWTIE -p $CORES $CWD/MitoIndex/MtRef XXXXX/raw_m.fastq --un XXXXX/m.fastq 2> ${illDIR}/m_bowtie.log
+cp XXXXX/m.fastq ${illDIR}
+	
+EOF
+sed 's/XXXXX/$TMPDIR/g' ${CWD}/qsubscripts/malemito.bashX > ${CWD}/qsubscripts/malemito.bash
+
+
+	MMALEJOB=$(qsub ${CWD}/qsubscripts/malemito.bash)
+	echo $MMALEJOB
+	MFEMALEJOB=$(qsub ${CWD}/qsubscripts/femalemito.bash)
+	echo $MFEMALEJOB	
+	
+	while qstat $MFEMALEJOB &> /dev/null; do
+	    sleep 10;
+	done;
+
+	while qstat $MMALEJOB &> /dev/null; do
+	    sleep 10;
+	done;
+
 
 fi
+
+#cp ${illDIR}/raw_f.fastq $TMPDIR/raw_f.fastq
+#$BOWTIE -p $CORES $CWD/MitoIndex/MtRef $TMPDIR/raw_f.fastq --un $TMPDIR/f.fastq 2> ${illDIR}/f_bowtie.log
+#cp $TMPDIR/f.fastq ${illDIR}
+
+#cp ${illDIR}/raw_m.fastq $TMPDIR/raw_m.fastq
+#$BOWTIE -p $CORES $CWD/MitoIndex/MtRef $TMPDIR/raw_m.fastq --un $TMPDIR/m.fastq 2> ${illDIR}/m_bowtie.log
+#cp $TMPDIR/m.fastq ${illDIR}
+
 
 
 printf "======= Done step 1 =======\n"

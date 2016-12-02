@@ -8,7 +8,7 @@
 module purge
 module load R
 
-cd $PBS_O_WORKDIR/
+cd $PBS_O_WORKDIR/Rscripts/
 
 R CMD BATCH --no-save --no-restore 2R_analysis_pacBioBins.R
 

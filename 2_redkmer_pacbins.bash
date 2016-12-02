@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N redkmer2
 #PBS -l walltime=72:00:00
-#PBS -l select=1:ncpus=24:mem=16gb:tmpspace=200gb
+#PBS -l select=1:ncpus=24:mem=16gb:tmpspace=400gb
 #PBS -e /home/nikiwind/reports
 #PBS -o /home/nikiwind/reports
 
@@ -65,7 +65,7 @@ cat > ${CWD}/qsubscripts/malepacbins.bash <<EOF
 #!/bin/bash
 #PBS -N redkmer_m_pacb
 #PBS -l walltime=72:00:00
-#PBS -l select=1:ncpus=24:mem=32gb:tmpspace=300gb
+#PBS -l select=1:ncpus=24:mem=32gb:tmpspace=500gb
 #PBS -e /home/nikiwind/reports
 #PBS -o /home/nikiwind/reports
 module load bowtie/1.1.1
@@ -94,7 +94,7 @@ cat > ${CWD}/qsubscripts/femalepacbins.bash <<EOF
 #!/bin/bash
 #PBS -N redkmer_f_pacb
 #PBS -l walltime=72:00:00
-#PBS -l select=1:ncpus=24:mem=32gb:tmpspace=300gb
+#PBS -l select=1:ncpus=24:mem=32gb:tmpspace=500gb
 #PBS -e /home/nikiwind/reports
 #PBS -o /home/nikiwind/reports
 module load bowtie/1.1.1
@@ -126,11 +126,11 @@ sed 's/YYYYY/$SORTFILE/g' ${CWD}/qsubscripts/femalepacbins.bashX > ${CWD}/qsubsc
 	echo $FEMALEJOB	
 	
 	while qstat $FEMALEJOB &> /dev/null; do
-	    sleep 90;
+	    sleep 10;
 	done;
 
 	while qstat $MALEJOB &> /dev/null; do
-	    sleep 90;
+	    sleep 10;
 	done;
 
 fi
