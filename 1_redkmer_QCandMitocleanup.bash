@@ -1,9 +1,8 @@
 #!/bin/bash
 #PBS -N redkmer1
-#PBS -l walltime=72:00:00
-#PBS -l select=1:ncpus=24:mem=16gb:tmpspace=100gb
-#PBS -e /home/nikiwind/reports
-#PBS -o /home/nikiwind/reports
+#PBS -l walltime=01:00:00
+#PBS -l select=1:ncpus=24:mem=16gb
+
 
 
 if [ -z ${PBS_ENVIRONMENT+x} ]
@@ -41,6 +40,7 @@ mkdir -p $CWD/kmers/Refgenome_blast
 mkdir -p $CWD/kmers/bowtie/offtargets
 mkdir -p $CWD/kmers/bowtie/offtargets/logs
 mkdir -p $CWD/MitoIndex
+mkdir -p $CWD/reports
 
 
 if [ -z ${PBS_ENVIRONMENT+x} ]
@@ -59,12 +59,14 @@ $BOWTIEB $MtREF ${CWD}/MitoIndex/MtRef
 cat > ${CWD}/qsubscripts/femalemito.bashX <<EOF
 #!/bin/bash
 #PBS -N redkmer_f_mito
-#PBS -l walltime=72:00:00
-#PBS -l select=1:ncpus=24:mem=32gb:tmpspace=500gb
-#PBS -e /home/nikiwind/reports
-#PBS -o /home/nikiwind/reports
+#PBS -l walltime=01:00:00
+#PBS -l select=1:ncpus=24:mem=16gb
+#PBS -e $CWD/reports
+#PBS -o $CWD/reports
+
 module load bowtie/1.1.1
 module load fastqc
+module load anaconda3/personal
 
 cp ${illDIR}/raw_f.fastq XXXXX/raw_f.fastq
 echo "========== producing quality report for female illumina library =========="
@@ -82,10 +84,12 @@ cat > ${CWD}/qsubscripts/malemito.bashX <<EOF
 #PBS -N redkmer_m_mito
 #PBS -l walltime=72:00:00
 #PBS -l select=1:ncpus=24:mem=32gb:tmpspace=500gb
-#PBS -e /home/nikiwind/reports
-#PBS -o /home/nikiwind/reports
+#PBS -e $CWD/reports
+#PBS -o $CWD/reports
+
 module load bowtie/1.1.1
 module load fastqc
+module load anaconda3/personal
 
 cp ${illDIR}/raw_m.fastq XXXXX/raw_m.fastq
 echo "========== producing quality report for male illumina library =========="
