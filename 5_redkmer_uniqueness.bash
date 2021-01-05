@@ -1,9 +1,7 @@
 #!/bin/bash
 #PBS -N redkmer5
-#PBS -l walltime=02:00:00
-#PBS -l select=1:ncpus=16:mem=16gb
-#PBS -e /home/nikiwind/reports
-#PBS -o /home/nikiwind/reports
+#PBS -l walltime=00:30:00
+#PBS -l select=1:ncpus=8:mem=40gb
 
 if [ -z ${PBS_ENVIRONMENT+x} ]
 then
