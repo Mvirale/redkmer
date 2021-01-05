@@ -1,9 +1,8 @@
 #!/bin/bash
 #PBS -N redkmer2
-#PBS -l walltime=72:00:00
-#PBS -l select=1:ncpus=24:mem=16gb:tmpspace=400gb
-#PBS -e /home/nikiwind/reports
-#PBS -o /home/nikiwind/reports
+#PBS -l walltime=00:30:00
+#PBS -l select=1:ncpus=8:mem=40gb
+
 
 if [ -z ${PBS_ENVIRONMENT+x} ]
 then
@@ -64,10 +63,11 @@ else
 cat > ${CWD}/qsubscripts/malepacbins.bash <<EOF
 #!/bin/bash
 #PBS -N redkmer_m_pacb
-#PBS -l walltime=72:00:00
-#PBS -l select=1:ncpus=24:mem=32gb:tmpspace=500gb
-#PBS -e /home/nikiwind/reports
-#PBS -o /home/nikiwind/reports
+#PBS -l walltime=00:30:00
+#PBS -l select=1:ncpus=8:mem=40gb
+#PBS -e $CWD/reports
+#PBS -o $CWD/reports
+
 module load bowtie/1.1.1
 
 	echo "==================================== Working on male pacbins ======================================="
@@ -93,10 +93,11 @@ sed 's/YYYYY/$SORTFILE/g' ${CWD}/qsubscripts/malepacbins.bashX > ${CWD}/qsubscri
 cat > ${CWD}/qsubscripts/femalepacbins.bash <<EOF
 #!/bin/bash
 #PBS -N redkmer_f_pacb
-#PBS -l walltime=72:00:00
-#PBS -l select=1:ncpus=24:mem=32gb:tmpspace=500gb
-#PBS -e /home/nikiwind/reports
-#PBS -o /home/nikiwind/reports
+#PBS -l walltime=00:30:00
+#PBS -l select=1:ncpus=8:mem=40gb
+#PBS -e $CWD/reports
+#PBS -o $CWD/reports
+
 module load bowtie/1.1.1
 
 	echo "==================================== Working on female pacbins ======================================="
