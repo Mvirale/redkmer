@@ -1,9 +1,7 @@
 #!/bin/bash
 #PBS -N redkmer3
-#PBS -l walltime=72:00:00
-#PBS -l select=1:ncpus=24:mem=32gb:tmpspace=400gb
-#PBS -e /home/nikiwind/reports
-#PBS -o /home/nikiwind/reports
+#PBS -l walltime=00:30:00
+#PBS -l select=1:ncpus=8:mem=40gb
 
 if [ -z ${PBS_ENVIRONMENT+x} ]
 then
@@ -23,72 +21,16 @@ illnorm=$((($illLIBMsize+$illLIBFsize)/2))
 
 printf "======= using jellyfish to create kmers of lenght 30 from male and female illumina libraries =======\n"
 
-if [ -z ${PBS_ENVIRONMENT+x} ]
-then
-	$JFISH count -C -L 2 -m 25 $illM -o $CWD/kmers/rawdata/m -c 3 -s 1000000000 -t $CORES
-	$JFISH count -C -L 2 -m 25 $illF -o $CWD/kmers/rawdata/f -c 3 -s 1000000000 -t $CORES
-	$JFISH dump $CWD/kmers/rawdata/m -c -L 2 -o $CWD/kmers/rawdata/m.counts
-	$JFISH dump $CWD/kmers/rawdata/f -c -L 2 -o $CWD/kmers/rawdata/f.counts
-	printf "======= sorting and counting kmer libraries =======\n"
-	time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=$BUFFERSIZE $CWD/kmers/rawdata/m.counts > $CWD/kmers/rawdata/m.sorted &
-	time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=$BUFFERSIZE $CWD/kmers/rawdata/f.counts > $CWD/kmers/rawdata/f.sorted &
-	wait $(jobs -p)
-else
 
-cat > ${CWD}/qsubscripts/femalejelly.bashX <<EOF
-#!/bin/bash
-#PBS -N redkmer_f_jf
-#PBS -l walltime=72:00:00
-#PBS -l select=1:ncpus=24:mem=32gb:tmpspace=400gb
-#PBS -e /home/nikiwind/reports
-#PBS -o /home/nikiwind/reports
-module load jellyfish
+$JFISH count -C -L 2 -m 25 $illM -o $CWD/kmers/rawdata/m -c 3 -s 1000000000 -t $CORES
+$JFISH count -C -L 2 -m 25 $illF -o $CWD/kmers/rawdata/f -c 3 -s 1000000000 -t $CORES
+$JFISH dump $CWD/kmers/rawdata/m -c -L 2 -o $CWD/kmers/rawdata/m.counts
+$JFISH dump $CWD/kmers/rawdata/f -c -L 2 -o $CWD/kmers/rawdata/f.counts
+printf "======= sorting and counting kmer libraries =======\n"
+time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=$BUFFERSIZE $CWD/kmers/rawdata/m.counts > $CWD/kmers/rawdata/m.sorted &
+time sort -k1b,1 --parallel=8 -T $CWD/temp --buffer-size=$BUFFERSIZE $CWD/kmers/rawdata/f.counts > $CWD/kmers/rawdata/f.sorted &
+wait $(jobs -p)
 
-cp $illF $TMPDIR
-$JFISH count -C -L 2 -m 25 XXXXX/f.fastq -o XXXXX/m -c 3 -s 1000000000 -t $CORES
-$JFISH dump XXXXX/f -c -L 2 -o XXXXX/f.counts
-printf "======= sorting and counting female kmer libraries =======\n"
-sort -k1b,1 -T XXXXX/temp --buffer-size=$BUFFERSIZE XXXXX/f.counts > XXXXX/f.sorted
-cp XXXXX/f.sorted $CWD/kmers/rawdata/
-	
-EOF
-sed 's/XXXXX/$TMPDIR/g' ${CWD}/qsubscripts/femalejelly.bashX > ${CWD}/qsubscripts/femalejelly.bash
-
-
-cat > ${CWD}/qsubscripts/malejelly.bashX <<EOF
-#!/bin/bash
-#PBS -N redkmer_m_jf
-#PBS -l walltime=72:00:00
-#PBS -l select=1:ncpus=24:mem=32gb:tmpspace=400gb
-#PBS -e /home/nikiwind/reports
-#PBS -o /home/nikiwind/reports
-module load jellyfish
-
-cp $illM $TMPDIR
-$JFISH count -C -L 2 -m 25 XXXXX/m.fastq -o XXXXX/m -c 3 -s 1000000000 -t $CORES
-$JFISH dump XXXXX/m -c -L 2 -o XXXXX/m.counts
-printf "======= sorting and counting male kmer libraries =======\n"
-sort -k1b,1 -T XXXXX/temp --buffer-size=$BUFFERSIZE XXXXX/m.counts > XXXXX/m.sorted
-cp XXXXX/m.sorted $CWD/kmers/rawdata/
-	
-EOF
-sed 's/XXXXX/$TMPDIR/g' ${CWD}/qsubscripts/malejelly.bashX > ${CWD}/qsubscripts/malejelly.bash
-
-
-	JMALEJOB=$(qsub ${CWD}/qsubscripts/malejelly.bash)
-	echo $JMALEJOB
-	JFEMALEJOB=$(qsub ${CWD}/qsubscripts/femalejelly.bash)
-	echo $JFEMALEJOB	
-	
-	while qstat $JFEMALEJOB &> /dev/null; do
-	    sleep 10;
-	done;
-
-	while qstat $JMALEJOB &> /dev/null; do
-	    sleep 10;
-	done;
-
-fi
 
 
 
