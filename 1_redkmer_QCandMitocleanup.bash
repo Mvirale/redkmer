@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N redkmer1
-#PBS -l walltime=01:00:00
-#PBS -l select=1:ncpus=24:mem=16gb
+#PBS -l walltime=00:30:00
+#PBS -l select=1:ncpus=8:mem=40gb
 
 
 
@@ -59,8 +59,8 @@ $BOWTIEB $MtREF ${CWD}/MitoIndex/MtRef
 cat > ${CWD}/qsubscripts/femalemito.bashX <<EOF
 #!/bin/bash
 #PBS -N redkmer_f_mito
-#PBS -l walltime=01:00:00
-#PBS -l select=1:ncpus=24:mem=16gb
+#PBS -l walltime=00:30:00
+#PBS -l select=1:ncpus=8:mem=40gb
 #PBS -e $CWD/reports
 #PBS -o $CWD/reports
 
@@ -82,8 +82,8 @@ sed 's/XXXXX/$TMPDIR/g' ${CWD}/qsubscripts/femalemito.bashX > ${CWD}/qsubscripts
 cat > ${CWD}/qsubscripts/malemito.bashX <<EOF
 #!/bin/bash
 #PBS -N redkmer_m_mito
-#PBS -l walltime=72:00:00
-#PBS -l select=1:ncpus=24:mem=32gb:tmpspace=500gb
+#PBS -l walltime=00:30:00
+#PBS -l select=1:ncpus=8:mem=40gb
 #PBS -e $CWD/reports
 #PBS -o $CWD/reports
 
