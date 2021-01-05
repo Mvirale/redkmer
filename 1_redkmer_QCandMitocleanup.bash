@@ -70,7 +70,7 @@ module load anaconda3/personal
 
 cp ${illDIR}/raw_f.fastq XXXXX/raw_f.fastq
 echo "========== producing quality report for female illumina library =========="
-$FASTQC XXXXX/raw_f.fastq -o ${CWD}/QualityReports
+$FASTQC XXXXX/raw_f.fastq -o ${CWD}/QualityReports -d ${CWD}/QualityReports
 echo "========== removing female illumina reads mapping to mitochondrial DNA =========="
 $BOWTIE -p $CORES $CWD/MitoIndex/MtRef XXXXX/raw_f.fastq --un XXXXX/f.fastq 2> ${illDIR}/f_bowtie.log
 cp XXXXX/f.fastq ${illDIR}
@@ -93,7 +93,7 @@ module load anaconda3/personal
 
 cp ${illDIR}/raw_m.fastq XXXXX/raw_m.fastq
 echo "========== producing quality report for male illumina library =========="
-$FASTQC XXXXX/raw_m.fastq -o ${CWD}/QualityReports
+$FASTQC XXXXX/raw_m.fastq -o ${CWD}/QualityReports -d ${CWD}/QualityReports
 echo "========== removing male illumina reads mapping to mitochondrial DNA =========="
 $BOWTIE -p $CORES $CWD/MitoIndex/MtRef XXXXX/raw_m.fastq --un XXXXX/m.fastq 2> ${illDIR}/m_bowtie.log
 cp XXXXX/m.fastq ${illDIR}
