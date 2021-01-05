@@ -13,6 +13,7 @@ echo "---> running on HPC cluster..."
 source $PBS_O_WORKDIR/redkmer.cfg
 module load samtools
 module load bowtie/1.1.1
+module load anaconda3/personal
 fi
 
 printf "======= calculating library sizes =======\n"
@@ -69,6 +70,7 @@ cat > ${CWD}/qsubscripts/malepacbins.bash <<EOF
 #PBS -o $CWD/reports
 
 module load bowtie/1.1.1
+module load anaconda3/personal
 
 	echo "==================================== Working on male pacbins ======================================="
 		cp $illM XXXXX
@@ -99,6 +101,7 @@ cat > ${CWD}/qsubscripts/femalepacbins.bash <<EOF
 #PBS -o $CWD/reports
 
 module load bowtie/1.1.1
+module load anaconda3/personal
 
 	echo "==================================== Working on female pacbins ======================================="
 		cp $illF XXXXX
