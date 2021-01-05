@@ -11,7 +11,7 @@ echo "---> running on the Perugia numbercruncher..."
 source redkmer.cfg
 else
 echo "---> running on HPC cluster..."
-source $PBS_O_WORKDIR/redkmer.cfg
+source $EPHEMERAL/redkmer/redkmer.cfg
 module load bowtie/1.1.1
 fi
 

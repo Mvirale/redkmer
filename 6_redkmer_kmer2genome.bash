@@ -2,8 +2,6 @@
 #PBS -N redkmer6
 #PBS -l walltime=02:00:00
 #PBS -l select=1:ncpus=16:mem=16gb
-#PBS -e /home/nikiwind/reports
-#PBS -o /home/nikiwind/reports
 
 if [ -z ${PBS_ENVIRONMENT+x} ]
 then
@@ -11,7 +9,7 @@ echo "---> running on the Perugia numbercruncher..."
 source redkmer.cfg
 else
 echo "---> running on HPC cluster..."
-source $PBS_O_WORKDIR/redkmer.cfg
+source $EPHEMERAL/redkmer/redkmer.cfg
 module load blast
 module load samtools
 fi
